@@ -318,20 +318,7 @@
  = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   const hoy = new Date();
 
-  // Poblar mes y año
-  MESES.forEach((m, i) => {
-    const o = document.createElement("option");
-    o.value = i; o.text = m;
-    if (i === hoy.getMonth()) o.selected = true;
-    document.getElementById("mesResumen").appendChild(o);
-  });
-  [-1, 0, 1].forEach(d => {
-    const y = hoy.getFullYear() + d;
-    const o = document.createElement("option");
-    o.value = y; o.text = y;
-    if (d === 0) o.selected = true;
-    document.getElementById("anioResumen").appendChild(o);
-  });
+
 
   function formatMonto(input) {
     let raw = input.value.replace(/\./g, "").replace(/[^0-9]/g, "");
