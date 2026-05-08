@@ -17,14 +17,8 @@
       --accent: #34C759;
       --btn: #000000;
       --radius-card: 16px;
-      --radius-input: 12px;
-      --input-h: 56px;
       --font-input: 17px;
       --font-label: 13px;
-    }
-
-    html {
-      font-size: 16px;
     }
 
     html, body {
@@ -36,18 +30,10 @@
       touch-action: manipulation;
     }
 
-    body {
-      padding: 24px 16px 80px;
-    }
+    body { padding: 24px 16px 80px; }
 
-    h1 {
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      margin-bottom: 24px;
-    }
+    h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 24px; }
 
-    /* ── Card ── */
     .card {
       background: var(--card);
       border-radius: var(--radius-card);
@@ -56,13 +42,6 @@
       overflow: hidden;
     }
 
-    /* ── Row dentro de card ── */
-    .row {
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ── Cada campo ── */
     .field {
       display: flex;
       flex-direction: column;
@@ -80,7 +59,6 @@
       letter-spacing: 0.04em;
     }
 
-    /* Inputs y selects */
     .field input,
     .field select {
       border: none;
@@ -98,33 +76,21 @@
 
     .field input::placeholder { color: var(--placeholder); }
 
-    /* Select con flecha custom */
     .select-wrap { position: relative; }
     .select-wrap::after {
       content: "›";
       position: absolute;
-      right: 0;
-      top: 50%;
+      right: 0; top: 50%;
       transform: translateY(-50%) rotate(90deg);
       font-size: 20px;
       color: var(--label);
       pointer-events: none;
     }
 
-    /* Monto con $ */
-    .monto-wrap {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .monto-prefix {
-      font-size: var(--font-input);
-      color: var(--label);
-      flex-shrink: 0;
-    }
+    .monto-wrap { display: flex; align-items: center; gap: 6px; }
+    .monto-prefix { font-size: var(--font-input); color: var(--label); flex-shrink: 0; }
     .monto-wrap input { flex: 1; }
 
-    /* ── Toggle ── */
     .toggle-field {
       display: flex;
       align-items: center;
@@ -136,21 +102,12 @@
     }
     .toggle-field:last-child { border-bottom: none; }
 
-    .toggle-text .title {
-      font-size: 17px;
-      color: var(--text);
-    }
-    .toggle-text .sub {
-      font-size: 13px;
-      color: var(--label);
-      margin-top: 2px;
-    }
+    .toggle-text .title { font-size: 17px; color: var(--text); }
+    .toggle-text .sub { font-size: 13px; color: var(--label); margin-top: 2px; }
 
-    /* Switch iOS */
     .switch {
       flex-shrink: 0;
-      width: 52px;
-      height: 30px;
+      width: 52px; height: 30px;
       background: #E5E5EA;
       border-radius: 15px;
       position: relative;
@@ -168,22 +125,15 @@
     }
     .switch.on .knob { transform: translateX(22px); }
 
-    /* ── Sección colapsable ── */
     .section { display: none; }
     .section.visible { display: block; }
 
-    /* ── Botón principal ── */
     .btn-guardar {
-      width: 100%;
-      height: 56px;
-      background: var(--btn);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius-card);
-      font-size: 17px;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
+      width: 100%; height: 56px;
+      background: var(--btn); color: #fff;
+      border: none; border-radius: var(--radius-card);
+      font-size: 17px; font-weight: 600;
+      font-family: inherit; cursor: pointer;
       margin-top: 8px;
       -webkit-tap-highlight-color: transparent;
       transition: opacity 0.15s;
@@ -191,22 +141,16 @@
     .btn-guardar:active { opacity: 0.75; }
     .btn-guardar:disabled { background: #C7C7CC; }
 
-    /* ── Toast ── */
     .toast {
       position: fixed;
       bottom: 36px; left: 50%;
       transform: translateX(-50%);
-      background: rgba(0,0,0,0.85);
-      color: #fff;
-      padding: 12px 22px;
-      border-radius: 100px;
-      font-size: 15px;
-      font-weight: 500;
-      white-space: nowrap;
-      opacity: 0;
+      background: rgba(0,0,0,0.85); color: #fff;
+      padding: 12px 22px; border-radius: 100px;
+      font-size: 15px; font-weight: 500;
+      white-space: nowrap; opacity: 0;
       transition: opacity 0.2s;
-      pointer-events: none;
-      z-index: 999;
+      pointer-events: none; z-index: 999;
     }
     .toast.show { opacity: 1; }
   </style>
@@ -215,13 +159,11 @@
 
 <h1>Cargar gasto</h1>
 
-<!-- Card principal -->
 <div class="card">
   <div class="field">
     <label>Descripción</label>
     <input type="text" id="descripcion" placeholder="Ej: Almuerzo con colegas" autocomplete="off" autocorrect="off">
   </div>
-
   <div class="field">
     <label>Monto total</label>
     <div class="monto-wrap">
@@ -229,7 +171,6 @@
       <input type="text" id="montoTotal" placeholder="0" inputmode="numeric" autocomplete="off" oninput="formatMonto(this)">
     </div>
   </div>
-
   <div class="field">
     <label>Categoría</label>
     <div class="select-wrap">
@@ -245,7 +186,6 @@
       </select>
     </div>
   </div>
-
   <div class="field">
     <label>Medio de pago</label>
     <div class="select-wrap">
@@ -255,34 +195,28 @@
       </select>
     </div>
   </div>
-
   <div class="field">
     <label>Mes</label>
     <div class="select-wrap">
       <select id="mesResumen"></select>
     </div>
   </div>
-
   <div class="field">
     <label>Año</label>
     <div class="select-wrap">
       <select id="anioResumen"></select>
     </div>
   </div>
-
   <div class="toggle-field" onclick="toggleCompartido()">
     <div class="toggle-text">
       <div class="title">Compartido con Iru</div>
       <div class="sub">Se registra el 50% del monto</div>
     </div>
-    <div class="switch" id="switchCompartido">
-      <div class="knob"></div>
-    </div>
+    <div class="switch" id="switchCompartido"><div class="knob"></div></div>
     <input type="checkbox" id="compartido" style="display:none">
   </div>
 </div>
 
-<!-- Sección inversiones -->
 <div class="card section" id="seccionInversiones">
   <div class="field">
     <label>Tipo de inversión</label>
@@ -301,7 +235,6 @@
   </div>
 </div>
 
-<!-- Sección tarjeta -->
 <div class="card section" id="seccionTC">
   <div class="field">
     <label>Cantidad de cuotas</label>
@@ -314,11 +247,26 @@
 
 <script>
   const APPS_SCRIPT_URL = "https://script.google.com/a/macros/escandarani.com.ar/s/AKfycbxplzR4NOBhj6CL_XqsFoAvkBbwLAkdZYlg_AZCnQOJBWNHa0ewKjAvTZAW_emI_WrtJQ/exec";
-
- = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   const hoy = new Date();
 
+  // Poblar selectores de mes y año
+  MESES.forEach((m, i) => {
+    const o = document.createElement("option");
+    o.value = i;
+    o.text = m;
+    if (i === hoy.getMonth()) o.selected = true;
+    document.getElementById("mesResumen").appendChild(o);
+  });
 
+  [-1, 0, 1].forEach(d => {
+    const y = hoy.getFullYear() + d;
+    const o = document.createElement("option");
+    o.value = y;
+    o.text = y;
+    if (d === 0) o.selected = true;
+    document.getElementById("anioResumen").appendChild(o);
+  });
 
   function formatMonto(input) {
     let raw = input.value.replace(/\./g, "").replace(/[^0-9]/g, "");
@@ -330,15 +278,18 @@
   }
 
   function toggleTC() {
-    document.getElementById("seccionTC").classList.toggle("visible", document.getElementById("medioPago").value === "Crédito");
+    const esTC = document.getElementById("medioPago").value === "Crédito";
+    document.getElementById("seccionTC").classList.toggle("visible", esTC);
   }
 
   function toggleInversiones() {
-    document.getElementById("seccionInversiones").classList.toggle("visible", document.getElementById("categoria").value === "Inversiones");
+    const esInv = document.getElementById("categoria").value === "Inversiones";
+    document.getElementById("seccionInversiones").classList.toggle("visible", esInv);
   }
 
   function toggleInvOtros() {
-    document.getElementById("campoInvOtros").classList.toggle("visible", document.getElementById("tipoInversion").value === "Otros");
+    const esOtros = document.getElementById("tipoInversion").value === "Otros";
+    document.getElementById("campoInvOtros").classList.toggle("visible", esOtros);
   }
 
   function toggleCompartido() {
@@ -378,25 +329,25 @@
     btn.textContent = "Guardando...";
 
     fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify({ descripcion, montoTotal, categoria, medioPago, compartido, mesResumen, anioResumen, cuotas, tipoInversion })
-      })
-      .then(r => r.json())
-      .then(res => {
-        btn.disabled = false;
-        btn.textContent = "Guardar gasto";
-        document.getElementById("descripcion").value = "";
-        document.getElementById("montoTotal").value = "";
-        document.getElementById("cuotas").value = 1;
-        document.getElementById("compartido").checked = false;
-        document.getElementById("switchCompartido").classList.remove("on");
-        mostrarToast(res.cuotas > 1 ? `✓ ${res.cuotas} cuotas guardadas` : "✓ Gasto guardado");
-      })
-      .catch(() => {
-        btn.disabled = false;
-        btn.textContent = "Guardar gasto";
-        mostrarToast("Error al guardar, intentá de nuevo");
-      });
+      method: "POST",
+      body: JSON.stringify({ descripcion, montoTotal, categoria, medioPago, compartido, mesResumen, anioResumen, cuotas, tipoInversion })
+    })
+    .then(r => r.json())
+    .then(res => {
+      btn.disabled = false;
+      btn.textContent = "Guardar gasto";
+      document.getElementById("descripcion").value = "";
+      document.getElementById("montoTotal").value = "";
+      document.getElementById("cuotas").value = 1;
+      document.getElementById("compartido").checked = false;
+      document.getElementById("switchCompartido").classList.remove("on");
+      mostrarToast(res.cuotas > 1 ? `✓ ${res.cuotas} cuotas guardadas` : "✓ Gasto guardado");
+    })
+    .catch(() => {
+      btn.disabled = false;
+      btn.textContent = "Guardar gasto";
+      mostrarToast("Error al guardar, intentá de nuevo");
+    });
   }
 </script>
 </body>
