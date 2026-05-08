@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis gastos</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F2F2F7;
+      --card: #FFFFFF;
+      --border: #E5E5EA;
+      --label: #8E8E93;
+      --text: #000000;
+      --placeholder: #C7C7CC;
+      --accent: #34C759;
+      --btn: #000000;
+      --radius-card: 16px;
+      --radius-input: 12px;
+      --input-h: 56px;
+      --font-input: 17px;
+      --font-label: 13px;
+    }
+
+    html {
+      font-size: 16px;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      color: var(--text);
+      touch-action: manipulation;
+    }
+
+    body {
+      padding: 24px 16px 80px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 24px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius-card);
+      padding: 0;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    /* ── Row dentro de card ── */
+    .row {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Cada campo ── */
+    .field {
+      display: flex;
+      flex-direction: column;
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .field:last-child { border-bottom: none; }
+
+    .field label {
+      font-size: var(--font-label);
+      font-weight: 500;
+      color: var(--label);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Inputs y selects */
+    .field input,
+    .field select {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: var(--font-input);
+      font-family: inherit;
+      color: var(--text);
+      width: 100%;
+      padding: 0;
+      min-height: 32px;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .field input::placeholder { color: var(--placeholder); }
+
+    /* Select con flecha custom */
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: "›";
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%) rotate(90deg);
+      font-size: 20px;
+      color: var(--label);
+      pointer-events: none;
+    }
+
+    /* Monto con $ */
+    .monto-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .monto-prefix {
+      font-size: var(--font-input);
+      color: var(--label);
+      flex-shrink: 0;
+    }
+    .monto-wrap input { flex: 1; }
+
+    /* ── Toggle ── */
+    .toggle-field {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .toggle-field:last-child { border-bottom: none; }
+
+    .toggle-text .title {
+      font-size: 17px;
+      color: var(--text);
+    }
+    .toggle-text .sub {
+      font-size: 13px;
+      color: var(--label);
+      margin-top: 2px;
+    }
+
+    /* Switch iOS */
+    .switch {
+      flex-shrink: 0;
+      width: 52px;
+      height: 30px;
+      background: #E5E5EA;
+      border-radius: 15px;
+      position: relative;
+      transition: background 0.25s;
+    }
+    .switch.on { background: var(--accent); }
+    .switch .knob {
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 26px; height: 26px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: transform 0.25s;
+    }
+    .switch.on .knob { transform: translateX(22px); }
+
+    /* ── Sección colapsable ── */
+    .section { display: none; }
+    .section.visible { display: block; }
+
+    /* ── Botón principal ── */
+    .btn-guardar {
+      width: 100%;
+      height: 56px;
+      background: var(--btn);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-card);
+      font-size: 17px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 8px;
+      -webkit-tap-highlight-color: transparent;
+      transition: opacity 0.15s;
+    }
+    .btn-guardar:active { opacity: 0.75; }
+    .btn-guardar:disabled { background: #C7C7CC; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 36px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 100px;
+      font-size: 15px;
+      font-weight: 500;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<h1>Cargar gasto</h1>
+
+<!-- Card principal -->
+<div class="card">
+  <div class="field">
+    <label>Descripción</label>
+    <input type="text" id="descripcion" placeholder="Ej: Almuerzo con colegas" autocomplete="off" autocorrect="off">
+  </div>
+
+  <div class="field">
+    <label>Monto total</label>
+    <div class="monto-wrap">
+      <span class="monto-prefix">$</span>
+      <input type="text" id="montoTotal" placeholder="0" inputmode="numeric" autocomplete="off" oninput="formatMonto(this)">
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Categoría</label>
+    <div class="select-wrap">
+      <select id="categoria" onchange="toggleInversiones()">
+        <option>Comida</option>
+        <option>Transporte</option>
+        <option>Salud</option>
+        <option>Gustos</option>
+        <option>Hogar</option>
+        <option>Inversiones</option>
+        <option>Deporte</option>
+        <option>Otro</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Medio de pago</label>
+    <div class="select-wrap">
+      <select id="medioPago" onchange="toggleTC()">
+        <option value="Contado">Contado</option>
+        <option value="Crédito">Tarjeta de crédito</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Mes</label>
+    <div class="select-wrap">
+      <select id="mesResumen"></select>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Año</label>
+    <div class="select-wrap">
+      <select id="anioResumen"></select>
+    </div>
+  </div>
+
+  <div class="toggle-field" onclick="toggleCompartido()">
+    <div class="toggle-text">
+      <div class="title">Compartido con Iru</div>
+      <div class="sub">Se registra el 50% del monto</div>
+    </div>
+    <div class="switch" id="switchCompartido">
+      <div class="knob"></div>
+    </div>
+    <input type="checkbox" id="compartido" style="display:none">
+  </div>
+</div>
+
+<!-- Sección inversiones -->
+<div class="card section" id="seccionInversiones">
+  <div class="field">
+    <label>Tipo de inversión</label>
+    <div class="select-wrap">
+      <select id="tipoInversion" onchange="toggleInvOtros()">
+        <option value="S&P500">S&P500</option>
+        <option value="Bonos">Bonos</option>
+        <option value="Compra de USD">Compra de USD</option>
+        <option value="Otros">Otros</option>
+      </select>
+    </div>
+  </div>
+  <div class="field section" id="campoInvOtros">
+    <label>Detalle</label>
+    <input type="text" id="invOtros" placeholder="Describí la inversión" autocomplete="off">
+  </div>
+</div>
+
+<!-- Sección tarjeta -->
+<div class="card section" id="seccionTC">
+  <div class="field">
+    <label>Cantidad de cuotas</label>
+    <input type="text" id="cuotas" value="1" inputmode="numeric" autocomplete="off">
+  </div>
+</div>
+
+<button class="btn-guardar" id="btnGuardar" onclick="guardar()">Guardar gasto</button>
+<div class="toast" id="toast"></div>
+
+<script>
+  const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  const hoy = new Date();
+
+  // Poblar mes y año
+  MESES.forEach((m, i) => {
+    const o = document.createElement("option");
+    o.value = i; o.text = m;
+    if (i === hoy.getMonth()) o.selected = true;
+    document.getElementById("mesResumen").appendChild(o);
+  });
+  [-1, 0, 1].forEach(d => {
+    const y = hoy.getFullYear() + d;
+    const o = document.createElement("option");
+    o.value = y; o.text = y;
+    if (d === 0) o.selected = true;
+    document.getElementById("anioResumen").appendChild(o);
+  });
+
+  function formatMonto(input) {
+    let raw = input.value.replace(/\./g, "").replace(/[^0-9]/g, "");
+    input.value = raw.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  }
+
+  function parseMonto() {
+    return parseInt(document.getElementById("montoTotal").value.replace(/\./g, "")) || 0;
+  }
+
+  function toggleTC() {
+    document.getElementById("seccionTC").classList.toggle("visible", document.getElementById("medioPago").value === "Crédito");
+  }
+
+  function toggleInversiones() {
+    document.getElementById("seccionInversiones").classList.toggle("visible", document.getElementById("categoria").value === "Inversiones");
+  }
+
+  function toggleInvOtros() {
+    document.getElementById("campoInvOtros").classList.toggle("visible", document.getElementById("tipoInversion").value === "Otros");
+  }
+
+  function toggleCompartido() {
+    const cb = document.getElementById("compartido");
+    cb.checked = !cb.checked;
+    document.getElementById("switchCompartido").classList.toggle("on", cb.checked);
+  }
+
+  function mostrarToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 3000);
+  }
+
+  function guardar() {
+    const descripcion = document.getElementById("descripcion").value.trim();
+    const montoTotal = parseMonto();
+    const categoria = document.getElementById("categoria").value;
+    const medioPago = document.getElementById("medioPago").value;
+    const compartido = document.getElementById("compartido").checked ? "Si" : "No";
+    const esTC = medioPago === "Crédito";
+    const mesResumen = parseInt(document.getElementById("mesResumen").value);
+    const anioResumen = parseInt(document.getElementById("anioResumen").value);
+    const cuotas = esTC ? parseInt(document.getElementById("cuotas").value) || 1 : 1;
+    const tipoInversion = categoria === "Inversiones"
+      ? (document.getElementById("tipoInversion").value === "Otros"
+          ? document.getElementById("invOtros").value.trim() || "Otros"
+          : document.getElementById("tipoInversion").value)
+      : null;
+
+    if (!descripcion) { mostrarToast("Completá la descripción"); return; }
+    if (!montoTotal || montoTotal <= 0) { mostrarToast("Ingresá un monto válido"); return; }
+
+    const btn = document.getElementById("btnGuardar");
+    btn.disabled = true;
+    btn.textContent = "Guardando...";
+
+    google.script.run
+      .withSuccessHandler(res => {
+        btn.disabled = false;
+        btn.textContent = "Guardar gasto";
+        document.getElementById("descripcion").value = "";
+        document.getElementById("montoTotal").value = "";
+        document.getElementById("cuotas").value = 1;
+        document.getElementById("compartido").checked = false;
+        document.getElementById("switchCompartido").classList.remove("on");
+        mostrarToast(res.cuotas > 1 ? `✓ ${res.cuotas} cuotas guardadas` : "✓ Gasto guardado");
+      })
+      .withFailureHandler(() => {
+        btn.disabled = false;
+        btn.textContent = "Guardar gasto";
+        mostrarToast("Error al guardar, intentá de nuevo");
+      })
+      .guardarGasto({ descripcion, montoTotal, categoria, medioPago, compartido, mesResumen, anioResumen, cuotas, tipoInversion });
+  }
+</script>
+</body>
+</html>
