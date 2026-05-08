@@ -313,7 +313,9 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  const APPS_SCRIPT_URL = "https://script.google.com/a/macros/escandarani.com.ar/s/AKfycbxplzR4NOBhj6CL_XqsFoAvkBbwLAkdZYlg_AZCnQOJBWNHa0ewKjAvTZAW_emI_WrtJQ/exec";
+
+ = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   const hoy = new Date();
 
   // Poblar mes y año
@@ -388,8 +390,12 @@
     btn.disabled = true;
     btn.textContent = "Guardando...";
 
-    google.script.run
-      .withSuccessHandler(res => {
+    fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify({ descripcion, montoTotal, categoria, medioPago, compartido, mesResumen, anioResumen, cuotas, tipoInversion })
+      })
+      .then(r => r.json())
+      .then(res => {
         btn.disabled = false;
         btn.textContent = "Guardar gasto";
         document.getElementById("descripcion").value = "";
@@ -399,12 +405,11 @@
         document.getElementById("switchCompartido").classList.remove("on");
         mostrarToast(res.cuotas > 1 ? `✓ ${res.cuotas} cuotas guardadas` : "✓ Gasto guardado");
       })
-      .withFailureHandler(() => {
+      .catch(() => {
         btn.disabled = false;
         btn.textContent = "Guardar gasto";
         mostrarToast("Error al guardar, intentá de nuevo");
-      })
-      .guardarGasto({ descripcion, montoTotal, categoria, medioPago, compartido, mesResumen, anioResumen, cuotas, tipoInversion });
+      });
   }
 </script>
 </body>
