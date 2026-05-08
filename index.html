@@ -246,7 +246,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const APPS_SCRIPT_URL = "https://script.google.com/a/macros/escandarani.com.ar/s/AKfycbxplzR4NOBhj6CL_XqsFoAvkBbwLAkdZYlg_AZCnQOJBWNHa0ewKjAvTZAW_emI_WrtJQ/exec";
+  const APPS_SCRIPT_URL = "https://script.google.com/a/macros/escandarani.com.ar/s/AKfycbzYMifIrArAq2sKctsQSCWvXiU7BBQAzddekx8EGScneUDS8GAxzuHHQVBmwwZTx2RSWQ/exec";
   const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   const hoy = new Date();
 
@@ -259,14 +259,14 @@
     document.getElementById("mesResumen").appendChild(o);
   });
 
-  [-1, 0, 1].forEach(d => {
-    const y = hoy.getFullYear() + d;
+  const anioActual = hoy.getFullYear();
+  for (let y = anioActual - 1; y <= 2030; y++) {
     const o = document.createElement("option");
     o.value = y;
     o.text = y;
-    if (d === 0) o.selected = true;
+    if (y === anioActual) o.selected = true;
     document.getElementById("anioResumen").appendChild(o);
-  });
+  }
 
   function formatMonto(input) {
     let raw = input.value.replace(/\./g, "").replace(/[^0-9]/g, "");
@@ -328,10 +328,9 @@
     btn.disabled = true;
     btn.textContent = "Guardando...";
 
-    fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      body: JSON.stringify({ descripcion, montoTotal, categoria, medioPago, compartido, mesResumen, anioResumen, cuotas, tipoInversion })
-    })
+    const payload = encodeURIComponent(JSON.stringify({ descripcion, montoTotal, categoria, medioPago, compartido, mesResumen, anioResumen, cuotas, tipoInversion }));
+
+    fetch(`${APPS_SCRIPT_URL}?data=${payload}`, { method: "GET" })
     .then(r => r.json())
     .then(res => {
       btn.disabled = false;
