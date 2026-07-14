@@ -34,46 +34,80 @@
 
     body { padding: 32px 16px 80px; }
 
-    h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 24px; text-align: center; }
+    h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 24px; text-align: left; }
 
+    /* Monto hero */
     .monto-hero {
-      display: flex; align-items: center;
-      justify-content: center; margin-bottom: 8px; gap: 6px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin-bottom: 8px;
     }
-    .monto-hero-prefix { font-size: 36px; font-weight: 300; color: var(--text-secondary); line-height: 1; }
-    .monto-hero-input {
-      border: none; outline: none; background: transparent;
-      font-size: 56px; font-weight: 300; color: var(--text);
-      font-family: inherit; text-align: center; width: 220px;
-      letter-spacing: -2px; caret-color: var(--accent);
+
+    .monto-prefix {
+      font-size: 40px;
+      font-weight: 300;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+      margin-right: 4px;
     }
-    .monto-hero-input::placeholder { color: var(--placeholder); }
+
+    #montoTotal {
+      font-size: 56px;
+      font-weight: 300;
+      color: var(--text);
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      font-family: inherit;
+      letter-spacing: -2px;
+      display: block;
+    }
+
+    #montoTotal::placeholder { color: var(--placeholder); }
 
     .desc-input {
-      display: block; width: 100%; border: none; outline: none;
-      background: transparent; font-size: 20px; font-family: inherit;
-      color: var(--text); text-align: center; margin-bottom: 28px; padding: 0;
+      display: block;
+      width: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 20px;
+      font-family: inherit;
+      color: var(--text);
+      text-align: left;
+      margin-bottom: 28px;
+      padding: 0;
     }
     .desc-input::placeholder { color: var(--placeholder); }
 
     .card {
-      background: var(--surface); border-radius: var(--radius-card);
-      border: 1px solid var(--border); padding: 0; margin-bottom: 12px; overflow: hidden;
+      background: var(--surface);
+      border-radius: var(--radius-card);
+      border: 1px solid var(--border);
+      padding: 0; margin-bottom: 12px;
+      overflow: hidden;
     }
 
     .field {
       display: flex; flex-direction: column;
-      padding: 14px 16px 10px; border-bottom: 1px solid var(--border);
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid var(--border);
     }
     .field:last-child { border-bottom: none; }
     .field label {
-      font-size: var(--font-label); font-weight: 500; color: var(--label);
-      margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em;
+      font-size: var(--font-label); font-weight: 500;
+      color: var(--label); margin-bottom: 4px;
+      text-transform: uppercase; letter-spacing: 0.04em;
     }
     .field input, .field select {
       border: none; outline: none; background: transparent;
-      font-size: var(--font-input); font-family: inherit; color: var(--text);
-      width: 100%; padding: 0; min-height: 32px; appearance: none; -webkit-appearance: none;
+      font-size: var(--font-input); font-family: inherit;
+      color: var(--text); width: 100%; padding: 0;
+      min-height: 32px; appearance: none; -webkit-appearance: none;
     }
     .field select option { background: #1a1a22; }
     .field input::placeholder { color: var(--placeholder); }
@@ -81,8 +115,8 @@
     .select-wrap { position: relative; }
     .select-wrap::after {
       content: "›"; position: absolute; right: 0; top: 50%;
-      transform: translateY(-50%) rotate(90deg); font-size: 20px;
-      color: var(--label); pointer-events: none;
+      transform: translateY(-50%) rotate(90deg);
+      font-size: 20px; color: var(--label); pointer-events: none;
     }
 
     .mes-anio-row { flex-direction: row; align-items: flex-start; padding: 0; }
@@ -119,11 +153,11 @@
     }
     .stepper-btn:active { background: var(--surface); }
     .stepper-btn:disabled { opacity: 0.25; cursor: default; }
-    .stepper-value { font-size: 20px; font-weight: 500; min-width: 24px; text-align: center; color: var(--text); }
+    .stepper-value { font-size: 20px; font-weight: 500; min-width: 24px; text-align: center; }
 
     .toggle-standalone {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 4px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+      padding: 16px 4px; cursor: pointer;
     }
     .toggle-text .title { font-size: 17px; color: var(--text); }
     .toggle-text .sub { font-size: 13px; color: var(--label); margin-top: 2px; }
@@ -133,9 +167,10 @@
     }
     .switch.on { background: var(--accent); }
     .switch .knob {
-      position: absolute; top: 2px; left: 2px; width: 26px; height: 26px;
-      background: #fff; border-radius: 50%;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4); transition: transform 0.25s;
+      position: absolute; top: 2px; left: 2px;
+      width: 26px; height: 26px; background: #fff;
+      border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      transition: transform 0.25s;
     }
     .switch.on .knob { transform: translateX(22px); }
 
@@ -164,12 +199,10 @@
 <h1>Nuevo gasto</h1>
 
 <div class="monto-hero">
-  <span class="monto-hero-prefix">$</span>
-  <input class="monto-hero-input" type="text" id="montoTotal" placeholder="0" inputmode="numeric" autocomplete="off" oninput="formatMonto(this)">
+  <span class="monto-prefix">$</span>
+  <input type="text" id="montoTotal" placeholder="0" inputmode="numeric" autocomplete="off" oninput="formatMonto(this)">
 </div>
-<div style="display:flex;justify-content:center;margin-bottom:28px;">
-  <input class="desc-input" type="text" id="descripcion" placeholder="Descripción" autocomplete="off" autocorrect="off">
-</div>
+<input class="desc-input" type="text" id="descripcion" placeholder="Descripción" autocomplete="off" autocorrect="off">
 
 <div class="card">
   <div class="field">
