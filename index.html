@@ -8,14 +8,16 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #F2F2F7;
-      --card: #FFFFFF;
-      --border: #E5E5EA;
-      --label: #8E8E93;
-      --text: #000000;
-      --placeholder: #C7C7CC;
-      --accent: #34C759;
-      --btn: #000000;
+      --bg: #0f0f13;
+      --surface: #1a1a22;
+      --border: rgba(255,255,255,0.07);
+      --label: #6b6b80;
+      --text: #f0f0f5;
+      --text-secondary: #9999b0;
+      --placeholder: #44445a;
+      --accent: #34c759;
+      --btn: #f0f0f5;
+      --btn-text: #0f0f13;
       --radius-card: 16px;
       --font-input: 17px;
       --font-label: 13px;
@@ -30,147 +32,146 @@
       touch-action: manipulation;
     }
 
-    body { padding: 24px 16px 80px; }
+    body { padding: 32px 16px 80px; }
 
-    h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 24px; }
+    h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 24px; text-align: center; }
+
+    .monto-hero {
+      display: flex; align-items: center;
+      justify-content: center; margin-bottom: 8px; gap: 6px;
+    }
+    .monto-hero-prefix { font-size: 36px; font-weight: 300; color: var(--text-secondary); line-height: 1; }
+    .monto-hero-input {
+      border: none; outline: none; background: transparent;
+      font-size: 56px; font-weight: 300; color: var(--text);
+      font-family: inherit; text-align: center; width: 220px;
+      letter-spacing: -2px; caret-color: var(--accent);
+    }
+    .monto-hero-input::placeholder { color: var(--placeholder); }
+
+    .desc-input {
+      display: block; width: 100%; border: none; outline: none;
+      background: transparent; font-size: 20px; font-family: inherit;
+      color: var(--text); text-align: center; margin-bottom: 28px; padding: 0;
+    }
+    .desc-input::placeholder { color: var(--placeholder); }
 
     .card {
-      background: var(--card);
-      border-radius: var(--radius-card);
-      padding: 0;
-      margin-bottom: 12px;
-      overflow: hidden;
+      background: var(--surface); border-radius: var(--radius-card);
+      border: 1px solid var(--border); padding: 0; margin-bottom: 12px; overflow: hidden;
     }
 
     .field {
-      display: flex;
-      flex-direction: column;
-      padding: 14px 16px 10px;
-      border-bottom: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      padding: 14px 16px 10px; border-bottom: 1px solid var(--border);
     }
     .field:last-child { border-bottom: none; }
-
     .field label {
-      font-size: var(--font-label);
-      font-weight: 500;
-      color: var(--label);
-      margin-bottom: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+      font-size: var(--font-label); font-weight: 500; color: var(--label);
+      margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em;
     }
-
-    .field input,
-    .field select {
-      border: none;
-      outline: none;
-      background: transparent;
-      font-size: var(--font-input);
-      font-family: inherit;
-      color: var(--text);
-      width: 100%;
-      padding: 0;
-      min-height: 32px;
-      appearance: none;
-      -webkit-appearance: none;
+    .field input, .field select {
+      border: none; outline: none; background: transparent;
+      font-size: var(--font-input); font-family: inherit; color: var(--text);
+      width: 100%; padding: 0; min-height: 32px; appearance: none; -webkit-appearance: none;
     }
-
+    .field select option { background: #1a1a22; }
     .field input::placeholder { color: var(--placeholder); }
 
     .select-wrap { position: relative; }
     .select-wrap::after {
-      content: "›";
-      position: absolute;
-      right: 0; top: 50%;
-      transform: translateY(-50%) rotate(90deg);
-      font-size: 20px;
-      color: var(--label);
-      pointer-events: none;
+      content: "›"; position: absolute; right: 0; top: 50%;
+      transform: translateY(-50%) rotate(90deg); font-size: 20px;
+      color: var(--label); pointer-events: none;
     }
 
-    .monto-wrap { display: flex; align-items: center; gap: 6px; }
-    .monto-prefix { font-size: var(--font-input); color: var(--label); flex-shrink: 0; }
-    .monto-wrap input { flex: 1; }
+    .mes-anio-row { flex-direction: row; align-items: flex-start; padding: 0; }
+    .mes-anio-item { flex: 1; display: flex; flex-direction: column; padding: 14px 16px 10px; }
+    .mes-anio-sep { display: none; }
 
-    .toggle-field {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 16px;
+    .chips {
+      display: flex; gap: 8px; padding: 14px 16px;
       border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
     }
-    .toggle-field:last-child { border-bottom: none; }
+    .chip {
+      flex: 1; padding: 10px 0; border-radius: 10px;
+      border: 1.5px solid var(--border); background: transparent;
+      color: var(--text-secondary); font-size: 15px; font-family: inherit;
+      font-weight: 500; cursor: pointer; text-align: center; transition: all 0.18s;
+    }
+    .chip.active { background: transparent; color: var(--text); border-color: var(--text); }
 
+    .stepper-field {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px; border-bottom: 1px solid var(--border);
+    }
+    .stepper-label {
+      font-size: var(--font-label); font-weight: 500; color: var(--label);
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .stepper { display: flex; align-items: center; gap: 20px; }
+    .stepper-btn {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 1.5px solid var(--border); background: transparent;
+      color: var(--text); font-size: 20px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s; line-height: 1;
+    }
+    .stepper-btn:active { background: var(--surface); }
+    .stepper-btn:disabled { opacity: 0.25; cursor: default; }
+    .stepper-value { font-size: 20px; font-weight: 500; min-width: 24px; text-align: center; color: var(--text); }
+
+    .toggle-standalone {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 4px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
     .toggle-text .title { font-size: 17px; color: var(--text); }
     .toggle-text .sub { font-size: 13px; color: var(--label); margin-top: 2px; }
-
     .switch {
-      flex-shrink: 0;
-      width: 52px; height: 30px;
-      background: #E5E5EA;
-      border-radius: 15px;
-      position: relative;
-      transition: background 0.25s;
+      flex-shrink: 0; width: 52px; height: 30px; background: #333344;
+      border-radius: 15px; position: relative; transition: background 0.25s;
     }
     .switch.on { background: var(--accent); }
     .switch .knob {
-      position: absolute;
-      top: 2px; left: 2px;
-      width: 26px; height: 26px;
-      background: #fff;
-      border-radius: 50%;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      transition: transform 0.25s;
+      position: absolute; top: 2px; left: 2px; width: 26px; height: 26px;
+      background: #fff; border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4); transition: transform 0.25s;
     }
     .switch.on .knob { transform: translateX(22px); }
 
-    .section { display: none; }
-    .section.visible { display: block; }
+    .hidden { display: none; }
 
     .btn-guardar {
-      width: 100%; height: 56px;
-      background: var(--btn); color: #fff;
-      border: none; border-radius: var(--radius-card);
-      font-size: 17px; font-weight: 600;
-      font-family: inherit; cursor: pointer;
-      margin-top: 8px;
-      -webkit-tap-highlight-color: transparent;
-      transition: opacity 0.15s;
+      width: 100%; height: 56px; background: var(--btn); color: var(--btn-text);
+      border: none; border-radius: var(--radius-card); font-size: 17px; font-weight: 600;
+      font-family: inherit; cursor: pointer; margin-top: 8px; transition: opacity 0.15s;
     }
     .btn-guardar:active { opacity: 0.75; }
-    .btn-guardar:disabled { background: #C7C7CC; }
+    .btn-guardar:disabled { background: #333344; color: var(--label); }
 
     .toast {
-      position: fixed;
-      bottom: 36px; left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.85); color: #fff;
-      padding: 12px 22px; border-radius: 100px;
-      font-size: 15px; font-weight: 500;
-      white-space: nowrap; opacity: 0;
-      transition: opacity 0.2s;
-      pointer-events: none; z-index: 999;
+      position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%);
+      background: var(--surface); border: 1px solid var(--border); color: var(--text);
+      padding: 12px 22px; border-radius: 100px; font-size: 15px; font-weight: 500;
+      white-space: nowrap; opacity: 0; transition: opacity 0.2s;
+      pointer-events: none; z-index: 999; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
     }
     .toast.show { opacity: 1; }
   </style>
 </head>
 <body>
 
-<h1>Cargar gasto</h1>
+<h1>Nuevo gasto</h1>
+
+<div class="monto-hero">
+  <span class="monto-hero-prefix">$</span>
+  <input class="monto-hero-input" type="text" id="montoTotal" placeholder="0" inputmode="numeric" autocomplete="off" oninput="formatMonto(this)">
+</div>
+<div style="display:flex;justify-content:center;margin-bottom:28px;">
+  <input class="desc-input" type="text" id="descripcion" placeholder="Descripción" autocomplete="off" autocorrect="off">
+</div>
 
 <div class="card">
-  <div class="field">
-    <label>Descripción</label>
-    <input type="text" id="descripcion" placeholder="Ej: Almuerzo con colegas" autocomplete="off" autocorrect="off">
-  </div>
-  <div class="field">
-    <label>Monto total</label>
-    <div class="monto-wrap">
-      <span class="monto-prefix">$</span>
-      <input type="text" id="montoTotal" placeholder="0" inputmode="numeric" autocomplete="off" oninput="formatMonto(this)">
-    </div>
-  </div>
   <div class="field">
     <label>Categoría</label>
     <div class="select-wrap">
@@ -186,39 +187,7 @@
       </select>
     </div>
   </div>
-  <div class="field">
-    <label>Medio de pago</label>
-    <div class="select-wrap">
-      <select id="medioPago" onchange="toggleTC()">
-        <option value="Contado">Contado</option>
-        <option value="Crédito">Tarjeta de crédito</option>
-      </select>
-    </div>
-  </div>
-  <div class="field">
-    <label>Mes</label>
-    <div class="select-wrap">
-      <select id="mesResumen"></select>
-    </div>
-  </div>
-  <div class="field">
-    <label>Año</label>
-    <div class="select-wrap">
-      <select id="anioResumen"></select>
-    </div>
-  </div>
-  <div class="toggle-field" onclick="toggleCompartido()">
-    <div class="toggle-text">
-      <div class="title">Compartido con Iru</div>
-      <div class="sub">Se registra el 50% del monto</div>
-    </div>
-    <div class="switch" id="switchCompartido"><div class="knob"></div></div>
-    <input type="checkbox" id="compartido" style="display:none">
-  </div>
-</div>
-
-<div class="card section" id="seccionInversiones">
-  <div class="field">
+  <div class="field hidden" id="fieldTipoInversion">
     <label>Tipo de inversión</label>
     <div class="select-wrap">
       <select id="tipoInversion" onchange="toggleInvOtros()">
@@ -229,17 +198,50 @@
       </select>
     </div>
   </div>
-  <div class="field section" id="campoInvOtros">
+  <div class="field hidden" id="fieldInvOtros">
     <label>Detalle</label>
     <input type="text" id="invOtros" placeholder="Describí la inversión" autocomplete="off">
   </div>
 </div>
 
-<div class="card section" id="seccionTC">
-  <div class="field">
-    <label>Cantidad de cuotas</label>
-    <input type="text" id="cuotas" value="1" inputmode="numeric" autocomplete="off">
+<div class="card">
+  <div class="chips">
+    <button class="chip active" id="chipContado" onclick="selectMedio('Contado')">Contado</button>
+    <button class="chip" id="chipCredito" onclick="selectMedio('Crédito')">Tarjeta de crédito</button>
   </div>
+  <input type="hidden" id="medioPago" value="Contado">
+  <div class="stepper-field hidden" id="fieldCuotas">
+    <span class="stepper-label">Cuotas</span>
+    <div class="stepper">
+      <button class="stepper-btn" id="cuotasMinus" onclick="stepCuotas(-1)" disabled>−</button>
+      <span class="stepper-value" id="cuotasDisplay">1</span>
+      <button class="stepper-btn" id="cuotasPlus" onclick="stepCuotas(1)">+</button>
+    </div>
+  </div>
+  <div class="field mes-anio-row">
+    <div class="mes-anio-item">
+      <label>Mes</label>
+      <div class="select-wrap">
+        <select id="mesResumen"></select>
+      </div>
+    </div>
+    <div class="mes-anio-sep"></div>
+    <div class="mes-anio-item">
+      <label>Año</label>
+      <div class="select-wrap">
+        <select id="anioResumen"></select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toggle-standalone" onclick="toggleCompartido()">
+  <div class="toggle-text">
+    <div class="title">Compartido con Iru</div>
+    <div class="sub">Se registra el 50% del monto</div>
+  </div>
+  <div class="switch" id="switchCompartido"><div class="knob"></div></div>
+  <input type="checkbox" id="compartido" style="display:none">
 </div>
 
 <button class="btn-guardar" id="btnGuardar" onclick="guardar()">Guardar gasto</button>
@@ -249,22 +251,19 @@
   const APPS_SCRIPT_URL = "https://script.google.com/a/macros/escandarani.com.ar/s/AKfycbzYMifIrArAq2sKctsQSCWvXiU7BBQAzddekx8EGScneUDS8GAxzuHHQVBmwwZTx2RSWQ/exec";
   const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   const hoy = new Date();
+  let cuotasVal = 1;
 
-  // Poblar selectores de mes y año
   MESES.forEach((m, i) => {
     const o = document.createElement("option");
-    o.value = i;
-    o.text = m;
+    o.value = i; o.text = m;
     if (i === hoy.getMonth()) o.selected = true;
     document.getElementById("mesResumen").appendChild(o);
   });
 
-  const anioActual = hoy.getFullYear();
-  for (let y = anioActual - 1; y <= 2030; y++) {
+  for (let y = hoy.getFullYear() - 1; y <= 2030; y++) {
     const o = document.createElement("option");
-    o.value = y;
-    o.text = y;
-    if (y === anioActual) o.selected = true;
+    o.value = y; o.text = y;
+    if (y === hoy.getFullYear()) o.selected = true;
     document.getElementById("anioResumen").appendChild(o);
   }
 
@@ -277,19 +276,33 @@
     return parseInt(document.getElementById("montoTotal").value.replace(/\./g, "")) || 0;
   }
 
-  function toggleTC() {
-    const esTC = document.getElementById("medioPago").value === "Crédito";
-    document.getElementById("seccionTC").classList.toggle("visible", esTC);
+  function selectMedio(val) {
+    document.getElementById("medioPago").value = val;
+    document.getElementById("chipContado").classList.toggle("active", val === "Contado");
+    document.getElementById("chipCredito").classList.toggle("active", val === "Crédito");
+    document.getElementById("fieldCuotas").classList.toggle("hidden", val !== "Crédito");
+    if (val !== "Crédito") { cuotasVal = 1; updateStepper(); }
+  }
+
+  function stepCuotas(delta) {
+    cuotasVal = Math.max(1, Math.min(48, cuotasVal + delta));
+    updateStepper();
+  }
+
+  function updateStepper() {
+    document.getElementById("cuotasDisplay").textContent = cuotasVal;
+    document.getElementById("cuotasMinus").disabled = cuotasVal <= 1;
   }
 
   function toggleInversiones() {
     const esInv = document.getElementById("categoria").value === "Inversiones";
-    document.getElementById("seccionInversiones").classList.toggle("visible", esInv);
+    document.getElementById("fieldTipoInversion").classList.toggle("hidden", !esInv);
+    if (!esInv) document.getElementById("fieldInvOtros").classList.add("hidden");
   }
 
   function toggleInvOtros() {
     const esOtros = document.getElementById("tipoInversion").value === "Otros";
-    document.getElementById("campoInvOtros").classList.toggle("visible", esOtros);
+    document.getElementById("fieldInvOtros").classList.toggle("hidden", !esOtros);
   }
 
   function toggleCompartido() {
@@ -314,15 +327,15 @@
     const esTC = medioPago === "Crédito";
     const mesResumen = parseInt(document.getElementById("mesResumen").value);
     const anioResumen = parseInt(document.getElementById("anioResumen").value);
-    const cuotas = esTC ? parseInt(document.getElementById("cuotas").value) || 1 : 1;
+    const cuotas = esTC ? cuotasVal : 1;
     const tipoInversion = categoria === "Inversiones"
       ? (document.getElementById("tipoInversion").value === "Otros"
           ? document.getElementById("invOtros").value.trim() || "Otros"
           : document.getElementById("tipoInversion").value)
       : null;
 
-    if (!descripcion) { mostrarToast("Completá la descripción"); return; }
-    if (!montoTotal || montoTotal <= 0) { mostrarToast("Ingresá un monto válido"); return; }
+    if (!descripcion) { mostrarToast("⚠️ Completá la descripción"); return; }
+    if (!montoTotal || montoTotal <= 0) { mostrarToast("⚠️ Ingresá un monto válido"); return; }
 
     const btn = document.getElementById("btnGuardar");
     btn.disabled = true;
@@ -337,7 +350,7 @@
       btn.textContent = "Guardar gasto";
       document.getElementById("descripcion").value = "";
       document.getElementById("montoTotal").value = "";
-      document.getElementById("cuotas").value = 1;
+      cuotasVal = 1; updateStepper();
       document.getElementById("compartido").checked = false;
       document.getElementById("switchCompartido").classList.remove("on");
       mostrarToast(res.cuotas > 1 ? `✓ ${res.cuotas} cuotas guardadas` : "✓ Gasto guardado");
