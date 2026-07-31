@@ -24,93 +24,56 @@
     }
 
     html, body {
-      width: 100%;
-      min-height: 100vh;
+      width: 100%; min-height: 100vh;
       background: var(--bg);
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
-      color: var(--text);
-      touch-action: manipulation;
+      color: var(--text); touch-action: manipulation;
     }
 
     body { padding: 32px 16px 80px; }
 
-    h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 24px; text-align: left; }
+    h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 24px; }
 
-    /* Monto hero */
-    .monto-hero {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .monto-prefix {
-      font-size: 40px;
-      font-weight: 300;
-      color: var(--text-secondary);
-      flex-shrink: 0;
-      margin-right: 4px;
-    }
-
+    .monto-hero { display: flex; flex-direction: row; align-items: center; margin-bottom: 8px; }
+    .monto-prefix { font-size: 40px; font-weight: 300; color: var(--text-secondary); flex-shrink: 0; margin-right: 4px; }
     #montoTotal {
-      font-size: 56px;
-      font-weight: 300;
-      color: var(--text);
-      background: transparent;
-      border: none;
-      outline: none;
-      padding: 0;
-      margin: 0;
-      width: 100%;
-      font-family: inherit;
-      letter-spacing: -2px;
-      display: block;
+      font-size: 56px; font-weight: 300; color: var(--text);
+      background: transparent; border: none; outline: none;
+      padding: 0; margin: 0; width: 100%; font-family: inherit;
+      letter-spacing: -2px; display: block;
     }
-
     #montoTotal::placeholder { color: var(--placeholder); }
 
     .desc-input {
-      display: block;
-      width: 100%;
-      border: none;
-      outline: none;
-      background: transparent;
-      font-size: 20px;
-      font-family: inherit;
-      color: var(--text);
-      text-align: left;
-      margin-bottom: 28px;
-      padding: 0;
+      display: block; width: 100%; border: none; outline: none;
+      background: transparent; font-size: 20px; font-family: inherit;
+      color: var(--text); text-align: left; margin-bottom: 28px; padding: 0;
     }
     .desc-input::placeholder { color: var(--placeholder); }
 
     .card {
-      background: var(--surface);
-      border-radius: var(--radius-card);
-      border: 1px solid var(--border);
-      padding: 0; margin-bottom: 12px;
-      overflow: hidden;
+      background: var(--surface); border-radius: var(--radius-card);
+      border: 1px solid var(--border); padding: 0; margin-bottom: 12px; overflow: hidden;
     }
 
     .field {
       display: flex; flex-direction: column;
-      padding: 14px 16px 10px;
-      border-bottom: 1px solid var(--border);
+      padding: 14px 16px 10px; border-bottom: 1px solid var(--border);
     }
     .field:last-child { border-bottom: none; }
     .field label {
-      font-size: var(--font-label); font-weight: 500;
-      color: var(--label); margin-bottom: 4px;
-      text-transform: uppercase; letter-spacing: 0.04em;
+      font-size: var(--font-label); font-weight: 500; color: var(--label);
+      margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em;
     }
     .field input, .field select {
       border: none; outline: none; background: transparent;
-      font-size: var(--font-input); font-family: inherit;
-      color: var(--text); width: 100%; padding: 0;
-      min-height: 32px; appearance: none; -webkit-appearance: none;
+      font-size: var(--font-input); font-family: inherit; color: var(--text);
+      width: 100%; padding: 0; min-height: 32px;
+      appearance: none; -webkit-appearance: none;
     }
     .field select option { background: #1a1a22; }
     .field input::placeholder { color: var(--placeholder); }
+    .field select.unset { color: var(--placeholder); }
 
     .select-wrap { position: relative; }
     .select-wrap::after {
@@ -121,7 +84,6 @@
 
     .mes-anio-row { flex-direction: row; align-items: flex-start; padding: 0; }
     .mes-anio-item { flex: 1; display: flex; flex-direction: column; padding: 14px 16px 10px; }
-    .mes-anio-sep { display: none; }
 
     .chips {
       display: flex; gap: 8px; padding: 14px 16px;
@@ -133,7 +95,7 @@
       color: var(--text-secondary); font-size: 15px; font-family: inherit;
       font-weight: 500; cursor: pointer; text-align: center; transition: all 0.18s;
     }
-    .chip.active { background: transparent; color: var(--text); border-color: var(--text); }
+    .chip.active { color: var(--text); border-color: var(--text); }
 
     .stepper-field {
       display: flex; align-items: center; justify-content: space-between;
@@ -167,14 +129,13 @@
     }
     .switch.on { background: var(--accent); }
     .switch .knob {
-      position: absolute; top: 2px; left: 2px;
-      width: 26px; height: 26px; background: #fff;
-      border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-      transition: transform 0.25s;
+      position: absolute; top: 2px; left: 2px; width: 26px; height: 26px;
+      background: #fff; border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4); transition: transform 0.25s;
     }
     .switch.on .knob { transform: translateX(22px); }
 
-    .hidden { display: none; }
+    .hidden { display: none !important; }
 
     .btn-guardar {
       width: 100%; height: 56px; background: var(--btn); color: var(--btn-text);
@@ -183,6 +144,15 @@
     }
     .btn-guardar:active { opacity: 0.75; }
     .btn-guardar:disabled { background: #333344; color: var(--label); }
+
+    .btn-tablero {
+      display: block; width: 100%; height: 56px; line-height: 56px;
+      text-align: center; background: transparent; color: var(--text-secondary);
+      border: 1.5px solid var(--border); border-radius: var(--radius-card);
+      font-size: 17px; font-weight: 500; font-family: inherit;
+      cursor: pointer; margin-top: 10px; text-decoration: none; transition: opacity 0.15s;
+    }
+    .btn-tablero:active { opacity: 0.7; }
 
     .toast {
       position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%);
@@ -204,11 +174,12 @@
 </div>
 <input class="desc-input" type="text" id="descripcion" placeholder="Descripción" autocomplete="off" autocorrect="off">
 
+<!-- Categoría -->
 <div class="card">
   <div class="field">
-    <label>Categoría</label>
     <div class="select-wrap">
-      <select id="categoria" onchange="toggleInversiones()">
+      <select id="categoria" class="unset" onchange="toggleInversiones()">
+        <option value="" disabled selected>Categoría</option>
         <option>Comida</option>
         <option>Transporte</option>
         <option>Salud</option>
@@ -221,9 +192,9 @@
     </div>
   </div>
   <div class="field hidden" id="fieldTipoInversion">
-    <label>Tipo de inversión</label>
     <div class="select-wrap">
-      <select id="tipoInversion" onchange="toggleInvOtros()">
+      <select id="tipoInversion" class="unset" onchange="toggleInvOtros()">
+        <option value="" disabled selected>Tipo de inversión</option>
         <option value="S&P500">S&P500</option>
         <option value="Bonos">Bonos</option>
         <option value="Compra de USD">Compra de USD</option>
@@ -237,13 +208,14 @@
   </div>
 </div>
 
+<!-- Pago -->
 <div class="card">
   <div class="chips">
-    <button class="chip active" id="chipContado" onclick="selectMedio('Contado')">Contado</button>
-    <button class="chip" id="chipCredito" onclick="selectMedio('Crédito')">Tarjeta de crédito</button>
+    <button class="chip active" id="chipCredito" onclick="selectMedio('Crédito')">Tarjeta de crédito</button>
+    <button class="chip" id="chipContado" onclick="selectMedio('Contado')">Contado</button>
   </div>
-  <input type="hidden" id="medioPago" value="Contado">
-  <div class="stepper-field hidden" id="fieldCuotas">
+  <input type="hidden" id="medioPago" value="Crédito">
+  <div class="stepper-field" id="fieldCuotas">
     <span class="stepper-label">Cuotas</span>
     <div class="stepper">
       <button class="stepper-btn" id="cuotasMinus" onclick="stepCuotas(-1)" disabled>−</button>
@@ -258,7 +230,6 @@
         <select id="mesResumen"></select>
       </div>
     </div>
-    <div class="mes-anio-sep"></div>
     <div class="mes-anio-item">
       <label>Año</label>
       <div class="select-wrap">
@@ -268,6 +239,7 @@
   </div>
 </div>
 
+<!-- Compartido -->
 <div class="toggle-standalone" onclick="toggleCompartido()">
   <div class="toggle-text">
     <div class="title">Compartido con Iru</div>
@@ -278,6 +250,7 @@
 </div>
 
 <button class="btn-guardar" id="btnGuardar" onclick="guardar()">Guardar gasto</button>
+<a href="https://datastudio.google.com/reporting/d9d5502c-7d67-4954-a63a-8ad81a9175c3/page/p_59s1wvgk3d" target="_blank" class="btn-tablero">Ir al tablero</a>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -311,8 +284,8 @@
 
   function selectMedio(val) {
     document.getElementById("medioPago").value = val;
-    document.getElementById("chipContado").classList.toggle("active", val === "Contado");
     document.getElementById("chipCredito").classList.toggle("active", val === "Crédito");
+    document.getElementById("chipContado").classList.toggle("active", val === "Contado");
     document.getElementById("fieldCuotas").classList.toggle("hidden", val !== "Crédito");
     if (val !== "Crédito") { cuotasVal = 1; updateStepper(); }
   }
@@ -328,14 +301,20 @@
   }
 
   function toggleInversiones() {
-    const esInv = document.getElementById("categoria").value === "Inversiones";
+    const sel = document.getElementById("categoria");
+    sel.classList.toggle("unset", sel.value === "");
+    const esInv = sel.value === "Inversiones";
     document.getElementById("fieldTipoInversion").classList.toggle("hidden", !esInv);
-    if (!esInv) document.getElementById("fieldInvOtros").classList.add("hidden");
+    document.getElementById("fieldInvOtros").classList.add("hidden");
+    const tipoSel = document.getElementById("tipoInversion");
+    tipoSel.value = "";
+    tipoSel.classList.add("unset");
   }
 
   function toggleInvOtros() {
-    const esOtros = document.getElementById("tipoInversion").value === "Otros";
-    document.getElementById("fieldInvOtros").classList.toggle("hidden", !esOtros);
+    const sel = document.getElementById("tipoInversion");
+    sel.classList.toggle("unset", sel.value === "");
+    document.getElementById("fieldInvOtros").classList.toggle("hidden", sel.value !== "Otros");
   }
 
   function toggleCompartido() {
@@ -368,6 +347,7 @@
       : null;
 
     if (!descripcion) { mostrarToast("⚠️ Completá la descripción"); return; }
+    if (!categoria) { mostrarToast("⚠️ Seleccioná una categoría"); return; }
     if (!montoTotal || montoTotal <= 0) { mostrarToast("⚠️ Ingresá un monto válido"); return; }
 
     const btn = document.getElementById("btnGuardar");
@@ -383,6 +363,10 @@
       btn.textContent = "Guardar gasto";
       document.getElementById("descripcion").value = "";
       document.getElementById("montoTotal").value = "";
+      document.getElementById("categoria").value = "";
+      document.getElementById("categoria").classList.add("unset");
+      document.getElementById("fieldTipoInversion").classList.add("hidden");
+      document.getElementById("fieldInvOtros").classList.add("hidden");
       cuotasVal = 1; updateStepper();
       document.getElementById("compartido").checked = false;
       document.getElementById("switchCompartido").classList.remove("on");
