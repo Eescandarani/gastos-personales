@@ -362,6 +362,12 @@
     .then(res => {
       btn.disabled = false;
       btn.textContent = "Guardar gasto";
+      if (res.error) {
+        mostrarToast(res.error === "limite"
+          ? "⚠️ Límite por hora alcanzado, probá más tarde"
+          : "Error al guardar, intentá de nuevo");
+        return;
+      }
       document.getElementById("descripcion").value = "";
       document.getElementById("montoTotal").value = "";
       document.getElementById("categoria").value = "";
