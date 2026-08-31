@@ -268,6 +268,13 @@
   const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   const hoy = new Date();
   let cuotasVal = 1;
+  let enviando = false;
+  let idEnvio = null;
+
+  function nuevoId() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
+  }
 
   MESES.forEach((m, i) => {
     const o = document.createElement("option");
@@ -341,6 +348,7 @@
   }
 
   function guardar() {
+    if (enviando) return;
     const descripcion = document.getElementById("descripcion").value.trim();
     const montoTotal = parseMonto();
     const categoria = document.getElementById("categoria").value;
@@ -361,22 +369,30 @@
     if (!montoTotal || montoTotal <= 0) { mostrarToast("⚠️ Ingresá un monto válido"); return; }
 
     const btn = document.getElementById("btnGuardar");
+    enviando = true;
     btn.disabled = true;
     btn.textContent = "Guardando...";
 
-    const payload = encodeURIComponent(JSON.stringify({ descripcion, montoTotal, categoria, medioPago, compartido, mesResumen, anioResumen, cuotas, tipoInversion }));
+    // Clave de idempotencia: si la request se reintenta (red, redirect de Apps
+    // Script, iOS), llega el mismo idEnvio y el script no vuelve a escribir.
+    if (!idEnvio) idEnvio = nuevoId();
+
+    const payload = encodeURIComponent(JSON.stringify({ idEnvio, descripcion, montoTotal, categoria, medioPago, compartido, mesResumen, anioResumen, cuotas, tipoInversion }));
 
     fetch(`${APPS_SCRIPT_URL}?data=${payload}`, { method: "GET" })
     .then(r => r.json())
     .then(res => {
+      enviando = false;
       btn.disabled = false;
       btn.textContent = "Guardar gasto";
       if (res.error) {
+        // Se conserva idEnvio: si reintenta el mismo gasto, no se duplica.
         mostrarToast(res.error === "limite"
           ? "⚠️ Límite por hora alcanzado, probá más tarde"
           : "Error al guardar, intentá de nuevo");
         return;
       }
+      idEnvio = null;
       document.getElementById("descripcion").value = "";
       document.getElementById("montoTotal").value = "";
       document.getElementById("categoria").value = "";
@@ -389,6 +405,7 @@
       mostrarToast(res.cuotas > 1 ? `✓ ${res.cuotas} cuotas guardadas` : "✓ Gasto guardado");
     })
     .catch(() => {
+      enviando = false;
       btn.disabled = false;
       btn.textContent = "Guardar gasto";
       mostrarToast("Error al guardar, intentá de nuevo");
