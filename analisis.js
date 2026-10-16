@@ -95,6 +95,24 @@ function crearTooltip(cont) {
 
 const MARGEN = { izq: 56, der: 12, arr: 12, aba: 28 };
 
+// En pantallas táctiles no hay hover: el dato aparece al tocar o al arrastrar el
+// dedo de costado sobre el gráfico, y queda visible hasta que se toca afuera.
+let tooltipFijo = null;
+document.addEventListener("pointerdown", e => {
+  if (tooltipFijo && !tooltipFijo.cont.contains(e.target)) { tooltipFijo.limpiar(); tooltipFijo = null; }
+});
+
+function seguirPuntero(cont, zona, alMover, alLimpiar) {
+  zona.addEventListener("pointerdown", e => {
+    if (e.pointerType === "mouse") return;
+    if (tooltipFijo && tooltipFijo.cont !== cont) tooltipFijo.limpiar();
+    tooltipFijo = { cont, limpiar: alLimpiar };
+    alMover(e);
+  });
+  zona.addEventListener("pointermove", alMover);
+  zona.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") alLimpiar(); });
+}
+
 // Ejes, grilla y etiquetas del eje X (cada tantos meses para que no se pisen)
 function ejes(svg, ancho, alto, meses, xDe, esc) {
   const plotH = alto - MARGEN.arr - MARGEN.aba;
@@ -166,8 +184,7 @@ function graficoLinea(cont, meses, valores, opciones = {}) {
     return Math.max(0, Math.min(meses.length - 1, Math.round((x - MARGEN.izq) / (plotW / Math.max(1, meses.length - 1)))));
   };
 
-  zona.addEventListener("pointermove", e => marcar(indice(e)));
-  zona.addEventListener("pointerleave", limpiar);
+  seguirPuntero(cont, zona, e => marcar(indice(e)), limpiar);
   zona.addEventListener("focus", () => marcar(actual));
   zona.addEventListener("blur", limpiar);
   zona.addEventListener("keydown", e => {
@@ -199,6 +216,21 @@ function graficoColumnas(cont, meses, series) {
   const tip = crearTooltip(cont);
   const grupos = [];
 
+  function mostrar(i) {
+    grupos.forEach((otro, j) => otro.setAttribute("opacity", j === i ? 1 : 0.45));
+    tip.mostrar(xDe(i), base - alturaDe(totales[i]), etiquetaLarga(meses[i]), [
+      ...series.filter(s => s.valores[i] > 0).map(s => ({ nombre: s.nombre, valor: plata(s.valores[i]), color: s.color })),
+      { nombre: "Total", valor: plata(totales[i]) }
+    ]);
+  }
+  function ocultar() { grupos.forEach(otro => otro.setAttribute("opacity", 1)); tip.ocultar(); }
+  // El mes sale de la posición horizontal, así el dedo puede recorrer las columnas
+  const indice = e => {
+    const r = svg.getBoundingClientRect();
+    const x = (e.clientX - r.left) * (ancho / r.width);
+    return Math.max(0, Math.min(meses.length - 1, Math.floor((x - MARGEN.izq) / banda)));
+  };
+
   meses.forEach((k, i) => {
     const g = nodo("g", {}, svg);
     grupos.push(g);
@@ -222,19 +254,10 @@ function graficoColumnas(cont, meses, series) {
 
     // Zona de hover: toda la banda del mes, más grande que la columna
     const hit = nodo("rect", { x: MARGEN.izq + banda * i, y: MARGEN.arr, width: banda, height: plotH, class: "columna-hit", tabindex: 0, "aria-label": `${etiquetaLarga(k)}: ${plata(totales[i])}` }, svg);
-    const mostrar = () => {
-      grupos.forEach((otro, j) => otro.setAttribute("opacity", j === i ? 1 : 0.45));
-      tip.mostrar(xDe(i), base - alturaDe(totales[i]), etiquetaLarga(k), [
-        ...series.filter(s => s.valores[i] > 0).map(s => ({ nombre: s.nombre, valor: plata(s.valores[i]), color: s.color })),
-        { nombre: "Total", valor: plata(totales[i]) }
-      ]);
-    };
-    const ocultar = () => { grupos.forEach(otro => otro.setAttribute("opacity", 1)); tip.ocultar(); };
-    hit.addEventListener("pointerenter", mostrar);
-    hit.addEventListener("pointerleave", ocultar);
-    hit.addEventListener("focus", mostrar);
+    hit.addEventListener("focus", () => mostrar(i));
     hit.addEventListener("blur", ocultar);
   });
+  seguirPuntero(cont, svg, e => mostrar(indice(e)), ocultar);
 }
 
 // ---------- Tablas (vista accesible de cada gráfico) ----------

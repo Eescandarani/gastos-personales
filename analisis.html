@@ -35,6 +35,8 @@
     /* Gráficos */
     .grafico { position: relative; width: 100%; }
     .grafico svg { display: block; width: 100%; overflow: visible; }
+    /* Deja scrollear la página en vertical y usa el arrastre horizontal para recorrer los meses */
+    .grafico svg { touch-action: pan-y; -webkit-user-select: none; user-select: none; }
     .grafico text { fill: var(--text-secondary); font-size: 12px; font-family: inherit; font-variant-numeric: tabular-nums; }
     .grafico .grilla { stroke: rgba(150,180,255,0.09); stroke-width: 1; }
     .grafico .base { stroke: rgba(150,180,255,0.22); stroke-width: 1; }
