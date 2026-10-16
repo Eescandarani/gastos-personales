@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Mis gastos</title>
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
@@ -15,8 +15,7 @@
   <meta name="theme-color" content="#0b0f18">
   <link rel="stylesheet" href="styles.css">
   <style>
-    body { padding: 32px 16px 80px; }
-    .contenido { max-width: 520px; margin: 0 auto; }
+    .contenido { max-width: 552px; margin: 0 auto; padding: 32px 16px 0; }
     h1 { margin-bottom: 24px; }
   </style>
 </head>
@@ -26,8 +25,8 @@
   <h1>Nuevo gasto personal</h1>
   <div id="formulario"></div>
   <button class="btn-guardar" id="btnGuardar">Guardar gasto</button>
-  <a href="tablero.html" class="btn-tablero">Ir al tablero</a>
 </div>
+<nav class="navbar" id="navbar" data-actual="nuevo"></nav>
 <div class="toast" id="toast" role="status"></div>
 
 <script src="config.js"></script>

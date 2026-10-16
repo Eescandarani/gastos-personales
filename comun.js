@@ -41,3 +41,30 @@ function mostrarToast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove("show"), 3000);
 }
+
+// Barra de navegación inferior. Cada página pone <nav id="navbar" data-actual="...">
+// y acá se completa, así los íconos viven en un solo lugar.
+const SECCIONES = [
+  { id: "tablero", href: "tablero.html", texto: "Tablero",
+    icono: '<path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/>' },
+  { id: "nuevo", href: "index.html", texto: "Nuevo gasto",
+    icono: '<path d="M12 5v14"/><path d="M5 12h14"/>' },
+  { id: "global", href: "analisis.html", texto: "Global",
+    icono: '<path d="M4 20h16"/><path d="M7 16v-5"/><path d="M12 16V6"/><path d="M17 16v-8"/>' },
+];
+
+function montarNavbar() {
+  const nav = document.getElementById("navbar");
+  if (!nav) return;
+  const actual = nav.dataset.actual;
+  nav.setAttribute("aria-label", "Secciones");
+  nav.innerHTML = SECCIONES.map(s => `
+    <a href="${s.href}" class="nav-item${s.id === "nuevo" ? " nav-destacado" : ""}${s.id === actual ? " activo" : ""}"
+       ${s.id === actual ? 'aria-current="page"' : ""}>
+      <span class="nav-icono"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="${s.id === "nuevo" ? 2.6 : 1.8}" stroke-linecap="round" stroke-linejoin="round">${s.icono}</svg></span>
+      <span class="nav-texto">${s.texto}</span>
+    </a>`).join("");
+}
+
+montarNavbar();

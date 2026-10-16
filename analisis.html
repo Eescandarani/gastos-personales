@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Análisis global</title>
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
@@ -15,16 +15,8 @@
   <meta name="theme-color" content="#0b0f18">
   <link rel="stylesheet" href="styles.css">
   <style>
-    .contenido { max-width: 1120px; margin: 0 auto; padding: 24px clamp(16px, 4vw, 48px) 120px; }
+    .contenido { max-width: 1120px; margin: 0 auto; padding: 24px clamp(16px, 4vw, 48px) 0; }
 
-    .volver {
-      display: inline-flex; align-items: center; min-height: 44px;
-      font-size: 16px; text-decoration: none; margin-bottom: 4px;
-    }
-    .volver .chevron {
-      display: inline-flex; align-items: center; height: 20px; font-size: 20px;
-      line-height: 1; margin-right: 6px; transform: translateY(-1px);
-    }
     h1 { font-size: clamp(28px, 4vw, 36px); margin-bottom: 28px; }
     .estado { font-size: 15px; color: var(--text-secondary); padding: 24px 0; }
 
@@ -96,7 +88,6 @@
 <body>
 
 <div class="contenido">
-  <a href="tablero.html" class="volver"><span class="chevron" aria-hidden="true">‹</span>Tablero</a>
   <h1>Análisis global</h1>
 
   <p class="estado" id="estado">Cargando gastos…</p>
@@ -140,6 +131,8 @@
     </section>
   </div>
 </div>
+
+<nav class="navbar" id="navbar" data-actual="global"></nav>
 
 <script src="config.js"></script>
 <script src="comun.js"></script>
