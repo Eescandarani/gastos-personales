@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,362 +13,39 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Gastos">
   <meta name="theme-color" content="#0b0f18">
+  <link rel="stylesheet" href="styles.css">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #0b0f18;
-      --surface: #151b28;
-      --border: rgba(150,180,255,0.09);
-      --label: #6b7793;
-      --text: #eef1f8;
-      --text-secondary: #93a1bd;
-      --placeholder: #3f4a63;
-      --accent: #34c759;
-      --btn: #eef1f8;
-      --btn-text: #0b0f18;
-      --muted-fill: #26304a;
-      --radius-card: 16px;
-      --font-input: 17px;
-      --font-label: 13px;
-    }
-
-    html, body {
-      width: 100%; min-height: 100vh;
-      background: var(--bg);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
-      color: var(--text); touch-action: manipulation;
-    }
-
     body { padding: 32px 16px 80px; }
-
-    h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 24px; }
-
-    .monto-hero { display: flex; flex-direction: row; align-items: center; margin-bottom: 8px; }
-    .monto-prefix { font-size: 40px; font-weight: 300; color: var(--text-secondary); flex-shrink: 0; margin-right: 4px; }
-    #montoTotal {
-      font-size: 56px; font-weight: 300; color: var(--text);
-      background: transparent; border: none; outline: none;
-      padding: 0; margin: 0; width: 100%; font-family: inherit;
-      letter-spacing: -2px; display: block;
-    }
-    #montoTotal::placeholder { color: var(--placeholder); }
-
-    .desc-input {
-      display: block; width: 100%; border: none; outline: none;
-      background: transparent; font-size: 20px; font-family: inherit;
-      color: var(--text); text-align: left; margin-bottom: 28px; padding: 0;
-    }
-    .desc-input::placeholder { color: var(--placeholder); }
-
-    .card {
-      background: var(--surface); border-radius: var(--radius-card);
-      border: 1px solid var(--border); padding: 0; margin-bottom: 12px; overflow: hidden;
-    }
-
-    .field {
-      display: flex; flex-direction: column;
-      padding: 14px 16px 10px; border-bottom: 1px solid var(--border);
-    }
-    .field:last-child { border-bottom: none; }
-    .field label {
-      font-size: var(--font-label); font-weight: 500; color: var(--label);
-      margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em;
-    }
-    .field input, .field select {
-      border: none; outline: none; background: transparent;
-      font-size: var(--font-input); font-family: inherit; color: var(--text);
-      width: 100%; padding: 0; min-height: 32px;
-      appearance: none; -webkit-appearance: none;
-    }
-    .field select option { background: #151b28; }
-    .field input::placeholder { color: var(--placeholder); }
-    .field select.unset { color: var(--placeholder); }
-
-    .select-wrap { position: relative; }
-    .select-wrap::after {
-      content: "›"; position: absolute; right: 0; top: 50%;
-      transform: translateY(-50%) rotate(90deg);
-      font-size: 20px; color: var(--label); pointer-events: none;
-    }
-
-    .mes-anio-row { flex-direction: row; align-items: flex-start; padding: 0; }
-    .mes-anio-item { flex: 1; display: flex; flex-direction: column; padding: 14px 16px 10px; }
-
-    .chips {
-      display: flex; gap: 8px; padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-    }
-    .chip {
-      flex: 1; padding: 10px 0; border-radius: 10px;
-      border: 1.5px solid var(--border); background: transparent;
-      color: var(--text-secondary); font-size: 15px; font-family: inherit;
-      font-weight: 500; cursor: pointer; text-align: center; transition: all 0.18s;
-    }
-    .chip.active { color: var(--text); border-color: var(--text); }
-
-    .stepper-field {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 16px; border-bottom: 1px solid var(--border);
-    }
-    .stepper-label {
-      font-size: var(--font-label); font-weight: 500; color: var(--label);
-      text-transform: uppercase; letter-spacing: 0.04em;
-    }
-    .stepper { display: flex; align-items: center; gap: 20px; }
-    .stepper-btn {
-      width: 32px; height: 32px; border-radius: 50%;
-      border: 1.5px solid var(--border); background: transparent;
-      color: var(--text); font-size: 20px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.15s; line-height: 1;
-    }
-    .stepper-btn:active { background: var(--surface); }
-    .stepper-btn:disabled { opacity: 0.25; cursor: default; }
-    .stepper-value { font-size: 20px; font-weight: 500; min-width: 24px; text-align: center; }
-
-    .toggle-standalone {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 4px; cursor: pointer;
-    }
-    .toggle-text .title { font-size: 17px; color: var(--text); }
-    .toggle-text .sub { font-size: 13px; color: var(--label); margin-top: 2px; }
-    .switch {
-      flex-shrink: 0; width: 52px; height: 30px; background: var(--muted-fill);
-      border-radius: 15px; position: relative; transition: background 0.25s;
-    }
-    .switch.on { background: var(--accent); }
-    .switch .knob {
-      position: absolute; top: 2px; left: 2px; width: 26px; height: 26px;
-      background: #fff; border-radius: 50%;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4); transition: transform 0.25s;
-    }
-    .switch.on .knob { transform: translateX(22px); }
-
-    .hidden { display: none !important; }
-
-    .btn-guardar {
-      width: 100%; height: 56px; background: var(--btn); color: var(--btn-text);
-      border: none; border-radius: var(--radius-card); font-size: 17px; font-weight: 600;
-      font-family: inherit; cursor: pointer; margin-top: 8px; transition: opacity 0.15s;
-    }
-    .btn-guardar:active { opacity: 0.75; }
-    .btn-guardar:disabled { background: var(--muted-fill); color: var(--label); }
-
-    .btn-tablero {
-      display: block; width: 100%; height: 56px; line-height: 56px;
-      text-align: center; background: transparent; color: var(--text-secondary);
-      border: 1.5px solid var(--border); border-radius: var(--radius-card);
-      font-size: 17px; font-weight: 500; font-family: inherit;
-      cursor: pointer; margin-top: 10px; text-decoration: none; transition: opacity 0.15s;
-    }
-    .btn-tablero:active { opacity: 0.7; }
-
-    .toast {
-      position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%);
-      background: var(--surface); border: 1px solid var(--border); color: var(--text);
-      padding: 12px 22px; border-radius: 100px; font-size: 15px; font-weight: 500;
-      white-space: nowrap; opacity: 0; transition: opacity 0.2s;
-      pointer-events: none; z-index: 999; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-    }
-    .toast.show { opacity: 1; }
+    .contenido { max-width: 520px; margin: 0 auto; }
+    h1 { margin-bottom: 24px; }
   </style>
 </head>
 <body>
 
-<h1>Nuevo gasto personal</h1>
-
-<div class="monto-hero">
-  <span class="monto-prefix">$</span>
-  <input type="text" id="montoTotal" placeholder="0" inputmode="numeric" autocomplete="off" oninput="formatMonto(this)">
+<div class="contenido">
+  <h1>Nuevo gasto personal</h1>
+  <div id="formulario"></div>
+  <button class="btn-guardar" id="btnGuardar">Guardar gasto</button>
+  <a href="tablero.html" class="btn-tablero">Ir al tablero</a>
 </div>
-<input class="desc-input" type="text" id="descripcion" placeholder="Descripción" autocomplete="off" autocorrect="off">
+<div class="toast" id="toast" role="status"></div>
 
-<!-- Categoría -->
-<div class="card">
-  <div class="field">
-    <div class="select-wrap">
-      <select id="categoria" class="unset" onchange="toggleInversiones()">
-        <option value="" disabled selected>Categoría</option>
-        <option>Comida</option>
-        <option>Transporte</option>
-        <option>Salud</option>
-        <option>Gustos</option>
-        <option>Hogar</option>
-        <option>Inversiones</option>
-        <option>Deporte</option>
-        <option>Otro</option>
-      </select>
-    </div>
-  </div>
-  <div class="field hidden" id="fieldTipoInversion">
-    <div class="select-wrap">
-      <select id="tipoInversion" class="unset" onchange="toggleInvOtros()">
-        <option value="" disabled selected>Tipo de inversión</option>
-        <option value="S&P500">S&P500</option>
-        <option value="Bonos">Bonos</option>
-        <option value="Compra de USD">Compra de USD</option>
-        <option value="Otros">Otros</option>
-      </select>
-    </div>
-  </div>
-  <div class="field hidden" id="fieldInvOtros">
-    <label>Detalle</label>
-    <input type="text" id="invOtros" placeholder="Describí la inversión" autocomplete="off">
-  </div>
-</div>
-
-<!-- Pago -->
-<div class="card">
-  <div class="chips">
-    <button class="chip active" id="chipCredito" onclick="selectMedio('Crédito')">Tarjeta de crédito</button>
-    <button class="chip" id="chipContado" onclick="selectMedio('Contado')">Contado</button>
-  </div>
-  <input type="hidden" id="medioPago" value="Crédito">
-  <div class="stepper-field" id="fieldCuotas">
-    <span class="stepper-label">Cuotas</span>
-    <div class="stepper">
-      <button class="stepper-btn" id="cuotasMinus" onclick="stepCuotas(-1)" disabled>−</button>
-      <span class="stepper-value" id="cuotasDisplay">1</span>
-      <button class="stepper-btn" id="cuotasPlus" onclick="stepCuotas(1)">+</button>
-    </div>
-  </div>
-  <div class="field mes-anio-row">
-    <div class="mes-anio-item">
-      <label>Mes</label>
-      <div class="select-wrap">
-        <select id="mesResumen"></select>
-      </div>
-    </div>
-    <div class="mes-anio-item">
-      <label>Año</label>
-      <div class="select-wrap">
-        <select id="anioResumen"></select>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Compartido -->
-<div class="toggle-standalone" onclick="toggleCompartido()">
-  <div class="toggle-text">
-    <div class="title">Compartido con Iru</div>
-    <div class="sub">Se registra el 50% del monto</div>
-  </div>
-  <div class="switch" id="switchCompartido"><div class="knob"></div></div>
-  <input type="checkbox" id="compartido" style="display:none">
-</div>
-
-<button class="btn-guardar" id="btnGuardar" onclick="guardar()">Guardar gasto</button>
-<a href="https://datastudio.google.com/reporting/85cfb615-cc32-4be8-9c17-33dba04ad346/page/p_e69xx72kwd" target="_blank" class="btn-tablero">Ir al tablero</a>
-<div class="toast" id="toast"></div>
-
+<script src="config.js"></script>
+<script src="comun.js"></script>
+<script src="formulario.js"></script>
 <script>
-  const APPS_SCRIPT_URL = "https://script.google.com/a/macros/escandarani.com.ar/s/AKfycbzYMifIrArAq2sKctsQSCWvXiU7BBQAzddekx8EGScneUDS8GAxzuHHQVBmwwZTx2RSWQ/exec";
-  const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-  const hoy = new Date();
-  let cuotasVal = 1;
+  const form = crearFormulario(document.getElementById("formulario"), "alta");
+  const btn = document.getElementById("btnGuardar");
   let enviando = false;
   let idEnvio = null;
 
-  function nuevoId() {
-    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
-    return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
-  }
-
-  MESES.forEach((m, i) => {
-    const o = document.createElement("option");
-    o.value = i; o.text = m;
-    if (i === hoy.getMonth()) o.selected = true;
-    document.getElementById("mesResumen").appendChild(o);
-  });
-
-  for (let y = hoy.getFullYear() - 1; y <= 2030; y++) {
-    const o = document.createElement("option");
-    o.value = y; o.text = y;
-    if (y === hoy.getFullYear()) o.selected = true;
-    document.getElementById("anioResumen").appendChild(o);
-  }
-
-  function formatMonto(input) {
-    let raw = input.value.replace(/\./g, "").replace(/[^0-9]/g, "");
-    input.value = raw.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  }
-
-  function parseMonto() {
-    return parseInt(document.getElementById("montoTotal").value.replace(/\./g, "")) || 0;
-  }
-
-  function selectMedio(val) {
-    document.getElementById("medioPago").value = val;
-    document.getElementById("chipCredito").classList.toggle("active", val === "Crédito");
-    document.getElementById("chipContado").classList.toggle("active", val === "Contado");
-    document.getElementById("fieldCuotas").classList.toggle("hidden", val !== "Crédito");
-    if (val !== "Crédito") { cuotasVal = 1; updateStepper(); }
-  }
-
-  function stepCuotas(delta) {
-    cuotasVal = Math.max(1, Math.min(48, cuotasVal + delta));
-    updateStepper();
-  }
-
-  function updateStepper() {
-    document.getElementById("cuotasDisplay").textContent = cuotasVal;
-    document.getElementById("cuotasMinus").disabled = cuotasVal <= 1;
-  }
-
-  function toggleInversiones() {
-    const sel = document.getElementById("categoria");
-    sel.classList.toggle("unset", sel.value === "");
-    const esInv = sel.value === "Inversiones";
-    document.getElementById("fieldTipoInversion").classList.toggle("hidden", !esInv);
-    document.getElementById("fieldInvOtros").classList.add("hidden");
-    const tipoSel = document.getElementById("tipoInversion");
-    tipoSel.value = "";
-    tipoSel.classList.add("unset");
-  }
-
-  function toggleInvOtros() {
-    const sel = document.getElementById("tipoInversion");
-    sel.classList.toggle("unset", sel.value === "");
-    document.getElementById("fieldInvOtros").classList.toggle("hidden", sel.value !== "Otros");
-  }
-
-  function toggleCompartido() {
-    const cb = document.getElementById("compartido");
-    cb.checked = !cb.checked;
-    document.getElementById("switchCompartido").classList.toggle("on", cb.checked);
-  }
-
-  function mostrarToast(msg) {
-    const t = document.getElementById("toast");
-    t.textContent = msg;
-    t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 3000);
-  }
+  btn.addEventListener("click", guardar);
 
   function guardar() {
     if (enviando) return;
-    const descripcion = document.getElementById("descripcion").value.trim();
-    const montoTotal = parseMonto();
-    const categoria = document.getElementById("categoria").value;
-    const medioPago = document.getElementById("medioPago").value;
-    const compartido = document.getElementById("compartido").checked ? "Si" : "No";
-    const esTC = medioPago === "Crédito";
-    const mesResumen = parseInt(document.getElementById("mesResumen").value);
-    const anioResumen = parseInt(document.getElementById("anioResumen").value);
-    const cuotas = esTC ? cuotasVal : 1;
-    const tipoInversion = categoria === "Inversiones"
-      ? (document.getElementById("tipoInversion").value === "Otros"
-          ? document.getElementById("invOtros").value.trim() || "Otros"
-          : document.getElementById("tipoInversion").value)
-      : null;
+    const error = form.validar();
+    if (error) { mostrarToast(error); return; }
 
-    if (!descripcion) { mostrarToast("⚠️ Completá la descripción"); return; }
-    if (!categoria) { mostrarToast("⚠️ Seleccioná una categoría"); return; }
-    if (!montoTotal || montoTotal <= 0) { mostrarToast("⚠️ Ingresá un monto válido"); return; }
-
-    const btn = document.getElementById("btnGuardar");
     enviando = true;
     btn.disabled = true;
     btn.textContent = "Guardando...";
@@ -377,31 +54,18 @@
     // Script, iOS), llega el mismo idEnvio y el script no vuelve a escribir.
     if (!idEnvio) idEnvio = nuevoId();
 
-    const payload = encodeURIComponent(JSON.stringify({ idEnvio, descripcion, montoTotal, categoria, medioPago, compartido, mesResumen, anioResumen, cuotas, tipoInversion }));
-
-    fetch(`${APPS_SCRIPT_URL}?data=${payload}`, { method: "GET" })
-    .then(r => r.json())
+    llamarScript({ accion: "guardar", idEnvio, ...form.getDatos() })
     .then(res => {
       enviando = false;
       btn.disabled = false;
       btn.textContent = "Guardar gasto";
       if (res.error) {
         // Se conserva idEnvio: si reintenta el mismo gasto, no se duplica.
-        mostrarToast(res.error === "limite"
-          ? "⚠️ Límite por hora alcanzado, probá más tarde"
-          : "Error al guardar, intentá de nuevo");
+        mostrarToast(mensajeDeError(res));
         return;
       }
       idEnvio = null;
-      document.getElementById("descripcion").value = "";
-      document.getElementById("montoTotal").value = "";
-      document.getElementById("categoria").value = "";
-      document.getElementById("categoria").classList.add("unset");
-      document.getElementById("fieldTipoInversion").classList.add("hidden");
-      document.getElementById("fieldInvOtros").classList.add("hidden");
-      cuotasVal = 1; updateStepper();
-      document.getElementById("compartido").checked = false;
-      document.getElementById("switchCompartido").classList.remove("on");
+      form.reset();
       mostrarToast(res.cuotas > 1 ? `✓ ${res.cuotas} cuotas guardadas` : "✓ Gasto guardado");
     })
     .catch(() => {

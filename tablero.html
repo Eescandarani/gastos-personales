@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tablero de gastos</title>
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Gastos">
+  <meta name="theme-color" content="#0b0f18">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .contenido { max-width: 1120px; margin: 0 auto; padding: 24px clamp(16px, 4vw, 48px) 120px; }
+
+    .volver {
+      display: inline-flex; align-items: center; min-height: 44px;
+      font-size: 16px; text-decoration: none; margin-bottom: 4px;
+    }
+    .volver .chevron {
+      display: inline-flex; align-items: center; height: 20px; font-size: 20px;
+      line-height: 1; margin-right: 6px; transform: translateY(-1px);
+    }
+    .volver .chevron.derecha { margin-right: 0; margin-left: 6px; }
+    .navegacion { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 4px; }
+    .navegacion .volver { margin-bottom: 0; }
+
+    .encabezado {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      gap: 16px 24px; margin-bottom: 28px;
+    }
+    .encabezado h1 { font-size: clamp(28px, 4vw, 36px); }
+    .filtros {
+      flex: 1 1 300px; max-width: 420px; min-width: 0; display: flex;
+      background: var(--surface); border-radius: var(--radius-card);
+      border: 1px solid var(--border); overflow: hidden;
+    }
+    .filtros .field { flex: 1; justify-content: center; padding: 12px 16px; border-bottom: none; }
+    .filtros .field + .field { border-left: 1px solid var(--border); }
+
+    .estado { font-size: 15px; color: var(--text-secondary); padding: 24px 0; }
+
+    .columnas { display: flex; flex-wrap: wrap; gap: 8px 40px; align-items: flex-start; }
+    .col-resumen { flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; }
+    .col-lista { flex: 999 1 480px; min-width: 0; display: flex; flex-direction: column; }
+
+    .rotulo {
+      font-size: var(--font-label); font-weight: 500; color: var(--label);
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .total { font-size: 52px; font-weight: 300; letter-spacing: -2px; margin: 4px 0 14px; }
+
+    .pildoras { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .pildora {
+      display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px;
+      border-radius: 100px; border: 1.5px solid var(--border); background: var(--surface);
+      color: var(--text); font-family: inherit; font-size: 14px;
+    }
+    .pildora .nombre { color: var(--text-secondary); }
+    .pildora .valor { font-weight: 600; }
+    button.pildora { cursor: pointer; padding-right: 10px; }
+
+    .filtro-activo {
+      align-self: flex-start; display: inline-flex; align-items: center; gap: 8px;
+      min-height: 36px; padding: 6px 14px; border-radius: 100px;
+      border: 1.5px solid var(--text); background: transparent; color: var(--text);
+      font-family: inherit; font-size: 14px; cursor: pointer; margin-bottom: 12px;
+    }
+    .filtro-activo span { font-size: 16px; color: var(--text-secondary); }
+
+    .torta-card {
+      background: var(--surface); border-radius: var(--radius-card);
+      border: 1px solid var(--border); padding: 20px 16px 12px; margin: 12px 0 28px;
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+    }
+    .torta { width: 200px; height: 200px; border-radius: 50%; border: none; padding: 0; cursor: pointer; }
+    .leyendas { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+    .leyenda {
+      display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px;
+      padding: 8px 10px; border-radius: 10px; border: 1.5px solid transparent;
+      background: transparent; color: var(--text); font-family: inherit; font-size: 15px;
+      cursor: pointer; text-align: left; transition: all 0.18s;
+    }
+    .leyenda.activa { border-color: var(--text); }
+    .leyenda.apagada { opacity: 0.4; }
+    .leyenda .punto { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .leyenda .cat { flex: 1; }
+    .leyenda .pct { color: var(--text-secondary); font-size: 14px; }
+    .leyenda .monto { font-weight: 500; min-width: 96px; text-align: right; }
+
+    .lista { background: var(--surface); border-radius: var(--radius-card); border: 1px solid var(--border); margin-top: 8px; }
+    .gasto {
+      position: relative; display: flex; align-items: center; gap: 8px;
+      padding: 12px 4px 12px 16px; border-bottom: 1px solid var(--border);
+    }
+    .gasto:last-child { border-bottom: none; }
+    .gasto .info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+    .gasto .desc { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gasto .meta { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); }
+    .gasto .meta .punto { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .gasto .monto { font-size: 16px; font-weight: 500; white-space: nowrap; }
+    .lista .vacio { font-size: 15px; color: var(--text-secondary); padding: 16px; }
+
+    .dots {
+      width: 44px; height: 44px; border-radius: 50%; border: none; background: transparent;
+      color: var(--text-secondary); font-size: 22px; line-height: 1; cursor: pointer;
+      font-family: inherit; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    }
+    .dots:active { background: var(--muted-fill); }
+    .menu {
+      position: absolute; right: 8px; top: 52px; z-index: 60; width: 160px;
+      background: var(--surface-alta); border: 1px solid var(--border-fuerte);
+      border-radius: 12px; overflow: hidden; box-shadow: 0 12px 32px rgba(0,0,0,0.55);
+    }
+    .menu button {
+      display: block; width: 100%; height: 44px; padding: 0 16px; background: transparent;
+      border: none; color: var(--text); font-size: 16px; font-family: inherit;
+      text-align: left; cursor: pointer;
+    }
+    .menu button:active { background: var(--muted-fill); }
+    .menu button + button { border-top: 1px solid var(--border); color: var(--peligro-texto); }
+    .cerrar-menu { position: fixed; inset: 0; z-index: 50; background: transparent; border: none; cursor: default; }
+
+    .inv-cabecera { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .inv-cerrar {
+      width: 44px; height: 44px; margin: -10px -10px 0 0; border-radius: 50%; border: none;
+      background: transparent; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0;
+    }
+    .inv-total { font-size: 40px; font-weight: 300; letter-spacing: -1.5px; margin: 4px 0 12px; }
+    .barras { display: flex; flex-direction: column; gap: 18px; margin-bottom: 16px; }
+    .barra-fila { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; font-size: 15px; margin-bottom: 8px; }
+    .barra-fila .pct { color: var(--text-secondary); font-size: 13px; margin-right: 8px; }
+    .barra-fila .valor { font-weight: 600; }
+    .barra { height: 12px; border-radius: 6px; background: var(--bg); overflow: hidden; }
+    .barra div { height: 100%; border-radius: 6px; }
+    .dialogo.ancho { max-width: 480px; }
+
+    .acciones-edicion { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+<div class="contenido">
+  <nav class="navegacion">
+    <a href="index.html" class="volver"><span class="chevron" aria-hidden="true">‹</span>Nuevo gasto</a>
+    <a href="analisis.html" class="volver">Análisis global<span class="chevron derecha" aria-hidden="true">›</span></a>
+  </nav>
+  <div class="encabezado">
+    <h1>Tablero</h1>
+    <div class="filtros">
+      <div class="field"><div class="select-wrap"><select id="filtroMes" aria-label="Mes"></select></div></div>
+      <div class="field"><div class="select-wrap"><select id="filtroAnio" aria-label="Año"></select></div></div>
+    </div>
+  </div>
+
+  <p class="estado" id="estado">Cargando gastos…</p>
+
+  <div class="columnas hidden" id="columnas">
+    <div class="col-resumen">
+      <span class="rotulo" id="totalLabel">Gastos totales</span>
+      <span class="total" id="total"></span>
+      <div class="pildoras">
+        <span class="pildora"><span class="nombre">Contado</span><span class="valor" id="contado"></span></span>
+        <span class="pildora"><span class="nombre">Tarjeta de crédito</span><span class="valor" id="credito"></span></span>
+        <button class="pildora" id="btnInvertido" aria-label="Ver lo invertido por tipo de inversión">
+          <span class="nombre">Invertido</span><span class="valor" id="invertido"></span>
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#93a1bd" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11L11 5"/><path d="M6 5h5v5"/></svg>
+        </button>
+      </div>
+      <button class="filtro-activo hidden" id="filtroActivo"></button>
+      <div class="torta-card" id="tortaCard"></div>
+    </div>
+
+    <div class="col-lista">
+      <span class="rotulo" id="cantidad"></span>
+      <div class="lista" id="lista"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de editar: el formulario se arma una vez y se recarga en cada edición -->
+<div class="sheet-wrap hidden" id="modalEditar">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="tituloEditar">
+    <h2 id="tituloEditar">Editar gasto</h2>
+    <p class="sub" id="subEditar"></p>
+    <div id="formEditar"></div>
+    <div class="acciones-edicion">
+      <button class="btn-primario" id="btnGuardarEdicion">Guardar cambios</button>
+      <button class="btn-secundario" id="btnCancelarEdicion">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Diálogos de confirmación e inversiones -->
+<div class="overlay hidden" id="modalDialogo">
+  <div class="dialogo" role="alertdialog" aria-modal="true" aria-labelledby="dialogoTitulo" id="dialogo"></div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="config.js"></script>
+<script src="comun.js"></script>
+<script src="formulario.js"></script>
+<script src="tablero.js"></script>
+</body>
+</html>
