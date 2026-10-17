@@ -17,7 +17,7 @@ function llamarScript(payload) {
 function mensajeDeError(res) {
   if (res && res.error === "limite") return "⚠️ Límite por hora alcanzado, probá más tarde";
   if (res && res.error === "cuotas_invalidas") return "⚠️ No podés dejar menos cuotas que la que estás editando";
-  if (res && res.error === "no_encontrado") return "⚠️ No se encontró el gasto, recargá el tablero";
+  if (res && res.error === "no_encontrado") return "⚠️ No se encontró el gasto, recargá la página";
   return "Error al guardar, intentá de nuevo";
 }
 
@@ -45,7 +45,7 @@ function mostrarToast(msg) {
 // Barra de navegación inferior. Cada página pone <nav id="navbar" data-actual="...">
 // y acá se completa, así los íconos viven en un solo lugar.
 const SECCIONES = [
-  { id: "tablero", href: "tablero.html", texto: "Tablero",
+  { id: "tablero", href: "tablero.html", texto: "Gastos del mes",
     icono: '<path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/>' },
   { id: "nuevo", href: "index.html", texto: "Nuevo gasto",
     icono: '<path d="M12 5v14"/><path d="M5 12h14"/>' },

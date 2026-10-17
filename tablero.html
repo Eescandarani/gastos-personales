@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Tablero de gastos</title>
+  <title>Gastos del mes</title>
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -80,6 +80,14 @@
     .leyenda .pct { color: var(--text-secondary); font-size: 14px; }
     .leyenda .monto { font-weight: 500; min-width: 96px; text-align: right; }
 
+    .lista-cab { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+    .filtro-medio { display: flex; gap: 8px; }
+    .chip-medio {
+      min-height: 36px; padding: 6px 14px; border-radius: 100px;
+      border: 1.5px solid var(--border); background: transparent; color: var(--text-secondary);
+      font-family: inherit; font-size: 14px; cursor: pointer; transition: all 0.18s;
+    }
+    .chip-medio[aria-pressed="true"] { color: var(--text); border-color: var(--text); }
     .lista { background: var(--surface); border-radius: var(--radius-card); border: 1px solid var(--border); margin-top: 8px; }
     .gasto {
       position: relative; display: flex; align-items: center; gap: 8px;
@@ -135,7 +143,7 @@
 
 <div class="contenido">
   <div class="encabezado">
-    <h1>Tablero</h1>
+    <h1>Gastos del mes</h1>
     <div class="filtros">
       <div class="field"><div class="select-wrap"><select id="filtroMes" aria-label="Mes"></select></div></div>
       <div class="field"><div class="select-wrap"><select id="filtroAnio" aria-label="Año"></select></div></div>
@@ -161,7 +169,13 @@
     </div>
 
     <div class="col-lista">
-      <span class="rotulo" id="cantidad"></span>
+      <div class="lista-cab">
+        <span class="rotulo" id="cantidad"></span>
+        <div class="filtro-medio" id="filtroMedio" role="group" aria-label="Filtrar por medio de pago">
+          <button class="chip-medio" data-medio="Contado" aria-pressed="false">Contado</button>
+          <button class="chip-medio" data-medio="Crédito" aria-pressed="false">Tarjeta de crédito</button>
+        </div>
+      </div>
       <div class="lista" id="lista"></div>
     </div>
   </div>

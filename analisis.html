@@ -79,12 +79,17 @@
       font-family: inherit; font-size: 13px; border-radius: 100px; padding: 4px 12px; cursor: pointer; min-height: 32px;
     }
     .lista-cuotas { flex: 1; overflow-y: auto; max-height: 360px; padding-right: 12px; }
-    .cuota { display: flex; align-items: center; gap: 12px; padding: 10px 2px; border-bottom: 1px solid var(--border); }
+    .cuotas-al-dia { font-size: 13px; color: var(--text-secondary); margin: -4px 0 4px; }
+    .lista-cuotas .vacio { font-size: 15px; color: var(--text-secondary); padding: 12px 2px; }
+    .cuota { display: flex; flex-direction: column; gap: 6px; padding: 12px 2px; border-bottom: 1px solid var(--border); }
     .cuota:last-child { border-bottom: none; }
-    .cuota .info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-    .cuota .desc { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .cuota .mes { font-size: 13px; color: var(--text-secondary); }
+    .cuota .arriba, .cuota .abajo { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .cuota .desc { font-size: 15px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .cuota .monto { font-size: 15px; font-weight: 500; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .cuota .abajo { font-size: 13px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+    .cuota .faltan { color: var(--text); font-weight: 500; }
+    .cuota .avance { height: 8px; border-radius: 4px; background: var(--bg); overflow: hidden; }
+    .cuota .avance div { height: 100%; border-radius: 4px; background: #3987e5; }
   </style>
 </head>
 <body>
@@ -116,7 +121,7 @@
 
     <section class="seccion">
       <h2>Cuotas</h2>
-      <p class="bajada">Lo que pagás en cuotas cada mes. Tocá un mes para ver sus cuotas.</p>
+      <p class="bajada">Lo que pagás en cuotas cada mes. Tocá un mes para ver qué compras tienen cuota ese mes.</p>
       <div class="fila-cuotas">
         <div class="card">
           <div class="grafico" id="grafCuotas"></div>
@@ -124,9 +129,10 @@
         </div>
         <div class="card">
           <div class="lista-cab">
-            <span class="rotulo" id="cuotasTitulo">Todas las cuotas</span>
+            <span class="rotulo" id="cuotasTitulo">Gastos en cuotas</span>
             <button class="hidden" id="cuotasTodas">Ver todas</button>
           </div>
+          <p class="cuotas-al-dia" id="cuotasAlDia"></p>
           <div class="lista-cuotas" id="listaCuotas"></div>
         </div>
       </div>

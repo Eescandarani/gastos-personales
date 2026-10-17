@@ -347,30 +347,79 @@ function pintarCuotas() {
   pintarListaCuotas();
 }
 
+// Junta las cuotas de cada compra. Las nuevas comparten grupo; las viejas se
+// cargaron sueltas ("Remera cuota 3") y se juntan por el nombre.
+const RE_CUOTA_VIEJA = /\s*cuota\s*(\d+)\s*$/i;
+
+function comprasEnCuotas() {
+  const hoyK = new Date().getFullYear() * 12 + new Date().getMonth();
+  const compras = {};
+  gastos.filter(esCuota).forEach(g => {
+    const vieja = g.cuotas <= 1 && RE_CUOTA_VIEJA.exec(g.detalle);
+    const nro = vieja ? Number(vieja[1]) : g.cuota;
+    const id = vieja ? "v:" + g.detalle.replace(RE_CUOTA_VIEJA, "").toLowerCase() : g.grupo || g.id;
+    const c = compras[id] || (compras[id] = { nombre: vieja ? g.detalle.replace(RE_CUOTA_VIEJA, "") : g.descripcion, total: 0, pagadas: 0, monto: 0, meses: [] });
+    c.total = Math.max(c.total, vieja ? nro : g.cuotas);
+    // La cuota del mes en curso ya cuenta como pagada
+    if (clave(g) <= hoyK) c.pagadas = Math.max(c.pagadas, nro);
+    c.monto = g.monto;
+    c.meses.push(clave(g));
+  });
+  return Object.values(compras).map(c => ({ ...c, faltan: Math.max(0, c.total - c.pagadas), ultimo: Math.max(...c.meses) }));
+}
+
 function pintarListaCuotas() {
-  const lista = gastos.filter(esCuota)
-    .filter(g => mesCuotas === null || clave(g) === mesCuotas)
-    .sort((a, b) => clave(b) - clave(a) || b.monto - a.monto);
+  // Las compras ya terminadas no se muestran
+  const lista = comprasEnCuotas()
+    .filter(c => c.faltan > 0 && (mesCuotas === null || c.meses.includes(mesCuotas)))
+    .sort((a, b) => b.faltan - a.faltan || b.ultimo - a.ultimo);
 
-  $("cuotasTitulo").textContent = mesCuotas === null ? `Todas las cuotas · ${lista.length}` : `${etiquetaLarga(mesCuotas)} · ${lista.length}`;
+  $("cuotasTitulo").textContent = mesCuotas === null ? `Gastos en cuotas · ${lista.length}` : `${etiquetaLarga(mesCuotas)} · ${lista.length}`;
   $("cuotasTodas").classList.toggle("hidden", mesCuotas === null);
+  $("cuotasAlDia").textContent = `Cuotas pagas al mes actual (${MESES[new Date().getMonth()].toLowerCase()} ${new Date().getFullYear()}).`;
 
-  $("listaCuotas").replaceChildren(...lista.map(g => {
+  if (!lista.length) {
+    const vacio = document.createElement("p");
+    vacio.className = "vacio";
+    vacio.textContent = "No hay cuotas pendientes.";
+    $("listaCuotas").replaceChildren(vacio);
+    return;
+  }
+
+  $("listaCuotas").replaceChildren(...lista.map(c => {
     const fila = document.createElement("div");
     fila.className = "cuota";
-    const info = document.createElement("div");
-    info.className = "info";
+    const arriba = document.createElement("div");
+    arriba.className = "arriba";
     const desc = document.createElement("span");
     desc.className = "desc";
-    desc.textContent = g.detalle || g.descripcion;
-    const mes = document.createElement("span");
-    mes.className = "mes";
-    mes.textContent = etiquetaLarga(clave(g));
-    info.append(desc, mes);
+    desc.textContent = c.nombre;
     const monto = document.createElement("span");
     monto.className = "monto";
-    monto.textContent = plata(g.monto);
-    fila.append(info, monto);
+    monto.textContent = plata(c.monto);
+    arriba.append(desc, monto);
+
+    const barra = document.createElement("div");
+    barra.className = "avance";
+    barra.setAttribute("role", "progressbar");
+    barra.setAttribute("aria-valuemin", 0);
+    barra.setAttribute("aria-valuemax", c.total);
+    barra.setAttribute("aria-valuenow", c.pagadas);
+    barra.setAttribute("aria-label", `${c.nombre}: ${c.pagadas} de ${c.total} cuotas pagadas`);
+    const relleno = document.createElement("div");
+    relleno.style.width = `${c.total ? c.pagadas / c.total * 100 : 0}%`;
+    barra.append(relleno);
+
+    const abajo = document.createElement("div");
+    abajo.className = "abajo";
+    const faltan = document.createElement("span");
+    faltan.className = "faltan";
+    faltan.textContent = `Falta${c.faltan === 1 ? "" : "n"} ${c.faltan} de ${c.total}`;
+    const pagas = document.createElement("span");
+    pagas.textContent = `${c.pagadas}/${c.total} pagas`;
+    abajo.append(faltan, pagas);
+
+    fila.append(arriba, barra, abajo);
     return fila;
   }));
 }

@@ -13,6 +13,7 @@ const estado = {
   mes: hoy.getMonth() + 1,
   anio: hoy.getFullYear(),
   cat: "",               // categoría elegida en la torta
+  medio: "",             // "Contado", "Crédito" o "" (ambos), solo filtra el listado
   menuId: null,          // gasto con el menú ⋯ abierto
   pedido: 0              // para descartar respuestas de un mes que ya no se mira
 };
@@ -132,8 +133,12 @@ function pintarTorta() {
   });
 }
 
+function esContado(g) { return g.medioPago === "Contado"; }
+
 function pintarLista(visibles) {
-  const ordenados = visibles.slice().sort((a, b) => (a.ts < b.ts ? 1 : -1));
+  const filtrados = estado.medio ? visibles.filter(g => esContado(g) === (estado.medio === "Contado")) : visibles;
+  const ordenados = filtrados.slice().sort((a, b) => (a.ts < b.ts ? 1 : -1));
+  $("filtroMedio").querySelectorAll("[data-medio]").forEach(b => b.setAttribute("aria-pressed", b.dataset.medio === estado.medio));
   $("cantidad").textContent = `Gastos · ${ordenados.length}`;
 
   if (!ordenados.length) {
@@ -142,7 +147,7 @@ function pintarLista(visibles) {
   }
 
   $("lista").innerHTML = ordenados.map(g => {
-    const medio = g.medioPago === "Contado" ? "Contado" : "Tarjeta de crédito";
+    const medio = esContado(g) ? "Contado" : "Tarjeta de crédito";
     const extra = (g.cuotas > 1 ? ` · Cuota ${g.cuota}/${g.cuotas}` : "") + (g.compartido === "Si" ? " · Compartido" : "");
     const abierto = estado.menuId === g.id;
     return `<div class="gasto">
@@ -174,6 +179,14 @@ $("tortaCard").addEventListener("click", e => {
 });
 
 $("filtroActivo").addEventListener("click", () => { estado.cat = ""; pintar(); });
+
+$("filtroMedio").addEventListener("click", e => {
+  const b = e.target.closest("[data-medio]");
+  if (!b) return;
+  estado.medio = estado.medio === b.dataset.medio ? "" : b.dataset.medio;
+  estado.menuId = null;
+  pintar();
+});
 
 $("lista").addEventListener("click", e => {
   const menu = e.target.closest("[data-menu]");
