@@ -177,6 +177,17 @@ h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
 .btn-peligro:active { opacity: 0.8; }
 .btn-peligro:disabled, .btn-secundario:disabled { opacity: 0.5; cursor: default; }
 
+/* ---------- Skeleton de carga ---------- */
+
+.carga-mensaje { font-size: 15px; color: var(--text-secondary); margin-bottom: 16px; }
+.carga-mensaje:empty { display: none; }
+.sk {
+  display: block; height: 14px; border-radius: 8px; background: var(--muted-fill);
+  animation: sk-latido 1.4s ease-in-out infinite;
+}
+@keyframes sk-latido { 50% { opacity: 0.45; } }
+@media (prefers-reduced-motion: reduce) { .sk { animation: none; } }
+
 /* ---------- Toast ---------- */
 
 .toast {

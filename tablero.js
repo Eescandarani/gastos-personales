@@ -36,8 +36,8 @@ $("filtroAnio").addEventListener("change", e => { estado.anio = Number(e.target.
 function cargar() {
   const pedido = ++estado.pedido;
   estado.menuId = null;
-  $("estado").textContent = "Cargando gastos…";
-  $("estado").classList.remove("hidden");
+  mostrarCarga();
+  $("estado").classList.add("hidden");
   $("columnas").classList.add("hidden");
 
   llamarScript({ accion: "listar", mes: estado.mes, anio: estado.anio })
@@ -45,13 +45,15 @@ function cargar() {
     if (pedido !== estado.pedido) return;
     if (!res.ok) throw new Error(res.error);
     estado.gastos = res.gastos;
-    $("estado").classList.add("hidden");
+    ocultarCarga();
     $("columnas").classList.remove("hidden");
     pintar();
   })
   .catch(() => {
     if (pedido !== estado.pedido) return;
+    ocultarCarga();
     $("estado").textContent = "No se pudieron cargar los gastos. Revisá la conexión y recargá la página.";
+    $("estado").classList.remove("hidden");
   });
 }
 

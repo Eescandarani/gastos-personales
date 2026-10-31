@@ -90,6 +90,10 @@
     .cuota .faltan { color: var(--text); font-weight: 500; }
     .cuota .avance { height: 8px; border-radius: 4px; background: var(--bg); overflow: hidden; }
     .cuota .avance div { height: 100%; border-radius: 4px; background: #3987e5; }
+
+    .sk-titulo { height: 20px; margin-bottom: 8px; }
+    .sk-bajada { max-width: 100%; margin-bottom: 14px; }
+    .sk-pie { width: 80px; margin: 16px 0 6px; }
   </style>
 </head>
 <body>
@@ -97,7 +101,40 @@
 <div class="contenido">
   <h1>Análisis global</h1>
 
-  <p class="estado" id="estado">Cargando gastos…</p>
+  <div id="carga">
+    <p class="carga-mensaje" id="cargaMensaje" role="status"></p>
+    <div aria-hidden="true">
+      <section class="seccion">
+        <span class="sk sk-titulo" style="width: 180px"></span>
+        <span class="sk sk-bajada" style="width: 260px"></span>
+        <div class="card"><span class="sk" style="height: 240px"></span><span class="sk sk-pie"></span></div>
+      </section>
+
+      <section class="seccion">
+        <span class="sk sk-titulo" style="width: 170px"></span>
+        <span class="sk sk-bajada" style="width: 240px"></span>
+        <div class="card"><span class="sk" style="height: 260px"></span><span class="sk sk-pie"></span></div>
+      </section>
+
+      <section class="seccion">
+        <span class="sk sk-titulo" style="width: 90px"></span>
+        <span class="sk sk-bajada" style="width: 320px"></span>
+        <div class="fila-cuotas">
+          <div class="card"><span class="sk" style="height: 240px"></span><span class="sk sk-pie"></span></div>
+          <div class="card">
+            <div class="lista-cab"><span class="sk" style="width: 150px"></span></div>
+            <div class="lista-cuotas">
+              <div class="cuota"><span class="sk" style="width: 70%"></span><span class="sk" style="height: 8px"></span><span class="sk" style="width: 45%; height: 12px"></span></div>
+              <div class="cuota"><span class="sk" style="width: 55%"></span><span class="sk" style="height: 8px"></span><span class="sk" style="width: 40%; height: 12px"></span></div>
+              <div class="cuota"><span class="sk" style="width: 65%"></span><span class="sk" style="height: 8px"></span><span class="sk" style="width: 45%; height: 12px"></span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <p class="estado hidden" id="estado"></p>
 
   <div id="secciones" class="hidden">
     <section class="seccion">

@@ -42,6 +42,21 @@ function mostrarToast(msg) {
   toastTimer = setTimeout(() => t.classList.remove("show"), 3000);
 }
 
+// Skeleton de los tableros (#carga). Si la espera pasa de 5 segundos, además avisa con un mensaje.
+let cargaTimer = null;
+function mostrarCarga() {
+  const mensaje = document.getElementById("cargaMensaje");
+  mensaje.textContent = "";
+  document.getElementById("carga").classList.remove("hidden");
+  clearTimeout(cargaTimer);
+  cargaTimer = setTimeout(() => { mensaje.textContent = "Cargando datos…"; }, 5000);
+}
+
+function ocultarCarga() {
+  clearTimeout(cargaTimer);
+  document.getElementById("carga").classList.add("hidden");
+}
+
 // Barra de navegación inferior. Cada página pone <nav id="navbar" data-actual="...">
 // y acá se completa, así los íconos viven en un solo lugar.
 const SECCIONES = [

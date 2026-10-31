@@ -439,19 +439,26 @@ new ResizeObserver(entradas => {
   if (gastos.length && Math.abs(w - anchoPrevio) > 2) { anchoPrevio = w; pintarTodo(); }
 }).observe($("secciones"));
 
+function mostrarEstado(mensaje) {
+  ocultarCarga();
+  $("estado").textContent = mensaje;
+  $("estado").classList.remove("hidden");
+}
+
+mostrarCarga();
 llamarScript({ accion: "listar", todos: true })
 .then(res => {
   if (!res.ok) throw new Error(res.error);
   gastos = res.gastos;
   if (!gastos.length) {
-    $("estado").textContent = "No hay gastos para analizar. Si recién actualizaste el script, revisá que esté publicada la versión nueva.";
+    mostrarEstado("No hay gastos para analizar. Si recién actualizaste el script, revisá que esté publicada la versión nueva.");
     return;
   }
-  $("estado").classList.add("hidden");
+  ocultarCarga();
   $("secciones").classList.remove("hidden");
   anchoPrevio = $("secciones").clientWidth;
   pintarTodo();
 })
 .catch(() => {
-  $("estado").textContent = "No se pudieron cargar los gastos. Revisá la conexión y recargá la página.";
+  mostrarEstado("No se pudieron cargar los gastos. Revisá la conexión y recargá la página.");
 });
