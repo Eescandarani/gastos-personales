@@ -421,12 +421,7 @@ function pintarListaCuotas() {
 
     const abajo = document.createElement("div");
     abajo.className = "abajo";
-    const faltan = document.createElement("span");
-    faltan.className = "faltan";
-    faltan.textContent = `Falta${c.faltan === 1 ? "" : "n"} ${c.faltan} de ${c.total}`;
-    const pagas = document.createElement("span");
-    pagas.textContent = `${c.pagadas}/${c.total} pagas`;
-    abajo.append(faltan, pagas);
+    abajo.textContent = `Falta${c.faltan === 1 ? "" : "n"} ${c.faltan} de ${c.total}`;
 
     fila.append(arriba, barra, abajo);
     return fila;
