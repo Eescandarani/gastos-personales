@@ -21,6 +21,14 @@ const estado = {
 const $ = id => document.getElementById(id);
 const formEditar = crearFormulario($("formEditar"), "editar");
 
+// Los compartidos se leen una sola vez (vienen todos los meses) y se filtran por
+// mes. Si no cargan, el tablero sigue andando solo con lo personal.
+let compartidos = null;
+const pedidoCompartidos = cargarCompartidos()
+  .then(lista => { compartidos = lista; })
+  .catch(() => { switchCompartidos.deshabilitar("No se pudieron cargar los compartidos"); });
+const switchCompartidos = montarSwitchCompartidos($("switchCompartidos"), () => { if (estado.gastos) pintar(); });
+
 // ---------- Filtros ----------
 
 MESES.forEach((m, i) => $("filtroMes").add(new Option(m, i + 1)));
@@ -40,8 +48,8 @@ function cargar() {
   $("estado").classList.add("hidden");
   $("columnas").classList.add("hidden");
 
-  llamarScript({ accion: "listar", mes: estado.mes, anio: estado.anio })
-  .then(res => {
+  Promise.all([llamarScript({ accion: "listar", mes: estado.mes, anio: estado.anio }), pedidoCompartidos])
+  .then(([res]) => {
     if (pedido !== estado.pedido) return;
     if (!res.ok) throw new Error(res.error);
     estado.gastos = res.gastos;
@@ -74,6 +82,12 @@ function porCategoria() {
   });
 }
 
+// Tu parte de los compartidos del mes elegido, si el switch está prendido.
+function compartidosDelMes() {
+  if (!compartidos || !switchCompartidos.prendido()) return [];
+  return compartidos.filter(g => g.mesResumen === estado.mes - 1 && g.anioResumen === estado.anio);
+}
+
 function alcance() {
   return estado.cat ? estado.gastos.filter(g => g.categoria === estado.cat) : estado.gastos;
 }
@@ -84,10 +98,21 @@ function pintar() {
   const visibles = alcance();
   const gastos = visibles.filter(g => g.categoria !== "Inversiones");
 
+  // Los compartidos solo suman a los totales de arriba, no a la torta ni al listado.
+  // Con una categoría elegida se muestran solo los personales, como la torta.
+  const comp = estado.cat ? [] : compartidosDelMes();
+  const conComp = gastos.concat(comp);
+
   $("totalLabel").textContent = estado.cat ? `Gastos en ${estado.cat}` : "Gastos totales";
-  $("total").textContent = plata(suma(gastos));
-  $("contado").textContent = plata(suma(gastos.filter(g => g.medioPago === "Contado")));
-  $("credito").textContent = plata(suma(gastos.filter(g => g.medioPago !== "Contado")));
+  $("total").textContent = plata(suma(conComp));
+  $("contado").textContent = plata(suma(conComp.filter(g => g.medioPago === "Contado")));
+  $("credito").textContent = plata(suma(conComp.filter(g => g.medioPago !== "Contado")));
+
+  const nota = $("notaCompartidos");
+  nota.classList.toggle("hidden", !comp.length);
+  nota.innerHTML = `Incluye ${plata(suma(comp))} de compartidos
+    <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg>`;
+  nota.setAttribute("aria-label", `Incluye ${plata(suma(comp))} de compartidos. Ver el detalle`);
   $("invertido").textContent = plata(suma(visibles.filter(g => g.categoria === "Inversiones")));
 
   const filtro = $("filtroActivo");
@@ -137,6 +162,12 @@ function pintarTorta() {
 
 function esContado(g) { return g.medioPago === "Contado"; }
 
+// Nombre que se muestra: en las inversiones, el tipo (si es "Otros", lo que se
+// escribió en el detalle, que se guarda como tipo).
+function nombre(g) {
+  return g.categoria === "Inversiones" && g.tipoInversion ? g.tipoInversion : g.descripcion;
+}
+
 function pintarLista(visibles) {
   const filtrados = estado.medio ? visibles.filter(g => esContado(g) === (estado.medio === "Contado")) : visibles;
   const ordenados = filtrados.slice().sort((a, b) => (a.ts < b.ts ? 1 : -1));
@@ -154,7 +185,7 @@ function pintarLista(visibles) {
     const abierto = estado.menuId === g.id;
     return `<div class="gasto">
       <div class="info">
-        <span class="desc">${escapar(g.descripcion)}</span>
+        <span class="desc">${escapar(nombre(g))}</span>
         <span class="meta"><span class="punto" style="background: ${COLORES[g.categoria] || "#93a1bd"}" aria-hidden="true"></span>${escapar(g.categoria)} · ${medio}${extra}</span>
       </div>
       <span class="monto">${plata(g.monto)}</span>
@@ -245,7 +276,7 @@ function pedirEliminar(g) {
   if (quedan) {
     abrirDialogo({
       titulo: "¿Eliminar esta cuota?",
-      texto: `“${g.descripcion}” es la cuota ${g.cuota} de ${g.cuotas}. Podés eliminar solo esta o también las siguientes.`,
+      texto: `“${nombre(g)}” es la cuota ${g.cuota} de ${g.cuotas}. Podés eliminar solo esta o también las siguientes.`,
       botones: [
         { texto: "Solo esta cuota", clase: "btn-peligro", accion: o => eliminar(g, "esta", o) },
         { texto: `Esta y las siguientes (${g.cuotas - g.cuota + 1})`, clase: "btn-peligro", accion: o => eliminar(g, "siguientes", o) },
@@ -255,7 +286,7 @@ function pedirEliminar(g) {
   } else {
     abrirDialogo({
       titulo: "¿Eliminar este gasto?",
-      texto: `Vas a eliminar “${g.descripcion}” por ${plata(g.monto)}.`,
+      texto: `Vas a eliminar “${nombre(g)}” por ${plata(g.monto)}.`,
       botones: [
         { texto: "Cancelar", clase: "btn-secundario", accion: cerrarDialogo },
         { texto: "Eliminar", clase: "btn-peligro", accion: o => eliminar(g, "esta", o) }
@@ -288,7 +319,7 @@ function pedirEditar(g) {
   if (g.cuotas > 1) {
     abrirDialogo({
       titulo: "¿Qué cuotas querés editar?",
-      texto: `“${g.descripcion}” es la cuota ${g.cuota} de ${g.cuotas}.`,
+      texto: `“${nombre(g)}” es la cuota ${g.cuota} de ${g.cuotas}.`,
       botones: [
         { texto: "Solo esta cuota", clase: "btn-primario", accion: () => { cerrarDialogo(); abrirEdicion(g, "esta"); } },
         { texto: "Esta y las siguientes", clase: "btn-primario", accion: () => { cerrarDialogo(); abrirEdicion(g, "siguientes"); } },
@@ -387,6 +418,41 @@ function guardarEdicion(datos, ocupadoDialogo) {
   .catch(() => { ocupado(false); mostrarToast("Error al guardar, intentá de nuevo"); });
 }
 
+// ---------- Detalle de compartidos ----------
+
+$("notaCompartidos").addEventListener("click", () => {
+  const comp = compartidosDelMes().slice().sort((a, b) => b.monto - a.monto);
+  const total = suma(comp);
+  const filas = comp.map(g => {
+    const medio = esContado(g) ? "Contado" : "Tarjeta de crédito";
+    const extra = g.cuotas > 1 ? ` · Cuota ${g.cuota}/${g.cuotas}` : "";
+    return `<div class="gasto solo-lectura">
+      <div class="info">
+        <span class="desc">${escapar(g.descripcion)}</span>
+        <span class="meta">${escapar(g.categoria)} · ${medio}${extra}</span>
+      </div>
+      <span class="monto">${plata(g.monto)}</span>
+    </div>`;
+  }).join("");
+
+  abrirDialogo({
+    ancho: true,
+    html: `
+      <div class="inv-cabecera">
+        <div>
+          <h2 id="dialogoTitulo">Tu parte de los compartidos</h2>
+          <span class="sub" style="color: var(--text-secondary); font-size: 14px">${MESES[estado.mes - 1]} ${estado.anio} · Contado ${plata(suma(comp.filter(esContado)))} · Tarjeta ${plata(suma(comp.filter(g => !esContado(g))))}</span>
+        </div>
+        <button class="inv-cerrar" id="compCerrar" aria-label="Cerrar">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#93a1bd" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l10 10"/><path d="M14 4L4 14"/></svg>
+        </button>
+      </div>
+      <span class="inv-total">${plata(total)}</span>
+      <div class="lista lista-dialogo">${filas}</div>`
+  });
+  $("compCerrar").addEventListener("click", cerrarDialogo);
+});
+
 // ---------- Inversiones por tipo ----------
 
 $("btnInvertido").addEventListener("click", () => {
@@ -418,8 +484,7 @@ $("btnInvertido").addEventListener("click", () => {
         </button>
       </div>
       <span class="inv-total">${plata(total)}</span>
-      ${inv.length ? `<div class="barras">${barras}</div>` : `<p>No hubo inversiones en este mes.</p>`}`,
-    botones: [{ texto: "Cerrar", clase: "btn-secundario", accion: cerrarDialogo }]
+      ${inv.length ? `<div class="barras">${barras}</div>` : `<p>No hubo inversiones en este mes.</p>`}`
   });
   $("invCerrar").addEventListener("click", cerrarDialogo);
 });

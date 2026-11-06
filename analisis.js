@@ -12,7 +12,9 @@ const SERIES_INV = [
 const SVGNS = "http://www.w3.org/2000/svg";
 const $ = id => document.getElementById(id);
 
-let gastos = [];
+let personales = [];     // lo que devolvió el script de gastos personales
+let compartidos = null;  // tu parte de los compartidos, o null si no cargaron
+let gastos = [];         // personales + compartidos según el switch
 let mesCuotas = null; // mes elegido en el gráfico de cuotas (clave) o null
 
 // ---------- Utilidades ----------
@@ -313,7 +315,8 @@ function pintarGastado() {
 }
 
 function pintarInvertido() {
-  const lista = gastos.filter(g => g.categoria === "Inversiones");
+  // Las inversiones son solo personales: el switch de compartidos no las toca
+  const lista = personales.filter(g => g.categoria === "Inversiones");
   if (!lista.length) return;
   const meses = rango(...extremos(lista));
   const series = SERIES_INV.map(s => {
@@ -358,7 +361,7 @@ function comprasEnCuotas() {
     const vieja = g.cuotas <= 1 && RE_CUOTA_VIEJA.exec(g.detalle);
     const nro = vieja ? Number(vieja[1]) : g.cuota;
     const id = vieja ? "v:" + g.detalle.replace(RE_CUOTA_VIEJA, "").toLowerCase() : g.grupo || g.id;
-    const c = compras[id] || (compras[id] = { nombre: vieja ? g.detalle.replace(RE_CUOTA_VIEJA, "") : g.descripcion, total: 0, pagadas: 0, monto: 0, meses: [] });
+    const c = compras[id] || (compras[id] = { nombre: vieja ? g.detalle.replace(RE_CUOTA_VIEJA, "") : g.descripcion, compartido: !!g.deCompartidos, total: 0, pagadas: 0, monto: 0, meses: [] });
     c.total = Math.max(c.total, vieja ? nro : g.cuotas);
     // La cuota del mes en curso ya cuenta como pagada
     if (clave(g) <= hoyK) c.pagadas = Math.max(c.pagadas, nro);
@@ -394,6 +397,12 @@ function pintarListaCuotas() {
     const desc = document.createElement("span");
     desc.className = "desc";
     desc.textContent = c.nombre;
+    if (c.compartido) {
+      const tag = document.createElement("span");
+      tag.className = "etiqueta";
+      tag.textContent = "Compartido";
+      desc.append(tag);
+    }
     const monto = document.createElement("span");
     monto.className = "monto";
     monto.textContent = plata(c.monto);
@@ -427,6 +436,11 @@ function pintarListaCuotas() {
 $("cuotasTodas").addEventListener("click", () => { mesCuotas = null; pintarListaCuotas(); });
 
 function pintarTodo() {
+  const con = compartidos && switchCompartidos.prendido();
+  gastos = con ? personales.concat(compartidos) : personales;
+  $("bajadaGastado").textContent = con
+    ? "Todo lo que no es inversión, mes a mes, con tu parte de los compartidos."
+    : "Todo lo que no es inversión, mes a mes.";
   pintarGastado();
   pintarInvertido();
   pintarCuotas();
@@ -436,7 +450,7 @@ function pintarTodo() {
 let anchoPrevio = 0;
 new ResizeObserver(entradas => {
   const w = entradas[0].contentRect.width;
-  if (gastos.length && Math.abs(w - anchoPrevio) > 2) { anchoPrevio = w; pintarTodo(); }
+  if (personales.length && Math.abs(w - anchoPrevio) > 2) { anchoPrevio = w; pintarTodo(); }
 }).observe($("secciones"));
 
 function mostrarEstado(mensaje) {
@@ -445,12 +459,22 @@ function mostrarEstado(mensaje) {
   $("estado").classList.remove("hidden");
 }
 
+const switchCompartidos = montarSwitchCompartidos($("switchCompartidos"), () => {
+  if (personales.length) { mesCuotas = null; pintarTodo(); }
+});
+
 mostrarCarga();
-llamarScript({ accion: "listar", todos: true })
-.then(res => {
+Promise.all([
+  llamarScript({ accion: "listar", todos: true }),
+  // Si los compartidos no cargan, se sigue solo con lo personal
+  cargarCompartidos().catch(() => null)
+])
+.then(([res, comp]) => {
   if (!res.ok) throw new Error(res.error);
-  gastos = res.gastos;
-  if (!gastos.length) {
+  personales = res.gastos;
+  compartidos = comp;
+  if (!comp) switchCompartidos.deshabilitar("No se pudieron cargar los compartidos");
+  if (!personales.length) {
     mostrarEstado("No hay gastos para analizar. Si recién actualizaste el script, revisá que esté publicada la versión nueva.");
     return;
   }

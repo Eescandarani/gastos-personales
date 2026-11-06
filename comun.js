@@ -13,6 +13,96 @@ function llamarScript(payload) {
   return fetch(`${APPS_SCRIPT_URL}?data=${data}`, { method: "GET" }).then(r => r.json());
 }
 
+// ---------- Gastos compartidos ----------
+
+// Lee la planilla de compartidos y devuelve tu parte de cada gasto, con la misma
+// forma que los gastos personales (mesResumen de 0 a 11, medioPago, cuotas...).
+// Lo que corresponde solo a Iru queda afuera; lo de los dos va a la mitad.
+function cargarCompartidos() {
+  return fetch(COMPARTIDOS_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify({ accion: "listar" })
+  })
+  .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+  .then(res => {
+    if (!res.ok) throw new Error(res.error || "compartidos");
+    return res.gastos.map(armarCompartido).filter(g => g && g.monto > 0);
+  });
+}
+
+function armarCompartido(f) {
+  const descripcion = String(f.descripcion ?? "").trim();
+  const mes = Number(f.mes), anio = Number(f.anio);
+  if (!descripcion || !mes || !anio) return null;
+
+  // Las cuotas se guardan como "Caldera 2/6"
+  const suf = descripcion.match(/\s*(\d+)\s*\/\s*(\d+)\s*$/);
+  const enCuotas = /^s/i.test(String(f.esCuotas ?? "")) && !!suf;
+  const base = enCuotas ? descripcion.slice(0, suf.index).trim() : descripcion;
+  const cuotas = enCuotas ? Number(suf[2]) : 1;
+
+  const total = Number(f.montoCuota) || Number(f.monto) || 0;
+  const corresponde = String(f.corresponde ?? "").trim().toLowerCase();
+  const parte = corresponde === YO.toLowerCase() ? 1 : corresponde === "iru" ? 0 : 0.5;
+
+  return {
+    id: "c" + f.fila,
+    grupo: "c:" + base.toLowerCase() + "/" + cuotas,
+    descripcion: base,
+    detalle: descripcion,
+    categoria: String(f.categoria ?? "").trim() || "Otro",
+    monto: total * parte,
+    medioPago: /contado/i.test(String(f.medio ?? "")) ? "Contado" : "Crédito",
+    cuota: enCuotas ? Number(suf[1]) : 1,
+    cuotas,
+    esCuotas: enCuotas,
+    mesResumen: mes - 1,
+    anioResumen: anio,
+    deCompartidos: true
+  };
+}
+
+// Preferencia del switch, compartida entre Gastos del mes y Global.
+// Si el navegador no deja guardar, arranca prendido.
+function leerIncluirCompartidos() {
+  try { return localStorage.getItem("incluirCompartidos") !== "no"; } catch (e) { return true; }
+}
+function guardarIncluirCompartidos(si) {
+  try { localStorage.setItem("incluirCompartidos", si ? "si" : "no"); } catch (e) { /* sin guardar */ }
+}
+
+// Arma el switch "Incluir compartidos" dentro de cont. alCambiar(prendido) se
+// llama al tocarlo. Devuelve { prendido(), deshabilitar(mensaje) }.
+function montarSwitchCompartidos(cont, alCambiar) {
+  let prendido = leerIncluirCompartidos();
+  cont.innerHTML = `
+    <button type="button" class="switch-compartidos" role="switch" aria-checked="${prendido}">
+      <span class="texto">Incluir compartidos</span>
+      <span class="switch chico${prendido ? " on" : ""}"><span class="knob"></span></span>
+    </button>
+    <span class="switch-aviso hidden" role="status"></span>`;
+  const btn = cont.querySelector("button");
+  btn.addEventListener("click", () => {
+    prendido = !prendido;
+    guardarIncluirCompartidos(prendido);
+    btn.setAttribute("aria-checked", prendido);
+    btn.querySelector(".switch").classList.toggle("on", prendido);
+    alCambiar(prendido);
+  });
+  return {
+    prendido: () => prendido && !btn.disabled,
+    deshabilitar(mensaje) {
+      btn.disabled = true;
+      btn.querySelector(".switch").classList.remove("on");
+      btn.setAttribute("aria-checked", "false");
+      const aviso = cont.querySelector(".switch-aviso");
+      aviso.textContent = mensaje;
+      aviso.classList.remove("hidden");
+    }
+  };
+}
+
 // Texto para el toast según el error que devolvió el script.
 function mensajeDeError(res) {
   if (res && res.error === "limite") return "⚠️ Límite por hora alcanzado, probá más tarde";

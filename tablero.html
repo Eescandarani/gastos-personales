@@ -52,6 +52,16 @@
     .pildora .valor { font-weight: 600; }
     button.pildora { cursor: pointer; padding-right: 10px; }
 
+    .switch-wrap { margin: -6px 0 8px; }
+    .nota-compartidos {
+      align-self: flex-start; display: inline-flex; align-items: center; gap: 4px;
+      min-height: 32px; margin: -12px 0 10px; padding: 0; background: transparent; border: none;
+      color: var(--text-secondary); font-family: inherit; font-size: 13px; cursor: pointer;
+    }
+    .nota-compartidos svg { flex-shrink: 0; }
+    .gasto.solo-lectura { padding-right: 16px; }
+    .lista-dialogo { max-height: 50vh; overflow-y: auto; }
+
     .filtro-activo {
       align-self: flex-start; display: inline-flex; align-items: center; gap: 8px;
       min-height: 36px; padding: 6px 14px; border-radius: 100px;
@@ -133,7 +143,7 @@
       justify-content: center; flex-shrink: 0;
     }
     .inv-total { font-size: 40px; font-weight: 300; letter-spacing: -1.5px; margin: 4px 0 12px; }
-    .barras { display: flex; flex-direction: column; gap: 18px; margin-bottom: 16px; }
+    .barras { display: flex; flex-direction: column; gap: 18px; margin-bottom: 4px; }
     .barra-fila { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; font-size: 15px; margin-bottom: 8px; }
     .barra-fila .pct { color: var(--text-secondary); font-size: 13px; margin-right: 8px; }
     .barra-fila .valor { font-weight: 600; }
@@ -159,6 +169,7 @@
     <p class="carga-mensaje" id="cargaMensaje" role="status"></p>
     <div class="columnas" aria-hidden="true">
       <div class="col-resumen">
+        <span class="sk" style="width: 190px; height: 24px; margin: 10px 0 18px"></span>
         <span class="sk" style="width: 130px"></span>
         <span class="sk" style="width: 240px; max-width: 100%; height: 48px; margin: 8px 0 18px"></span>
         <div class="pildoras">
@@ -199,8 +210,10 @@
 
   <div class="columnas hidden" id="columnas">
     <div class="col-resumen">
+      <div class="switch-wrap" id="switchCompartidos"></div>
       <span class="rotulo" id="totalLabel">Gastos totales</span>
       <span class="total" id="total"></span>
+      <button class="nota-compartidos hidden" id="notaCompartidos"></button>
       <div class="pildoras">
         <span class="pildora"><span class="nombre">Contado</span><span class="valor" id="contado"></span></span>
         <span class="pildora"><span class="nombre">Tarjeta de crédito</span><span class="valor" id="credito"></span></span>

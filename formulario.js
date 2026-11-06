@@ -66,14 +66,6 @@ function crearFormulario(contenedor, prefijo) {
         </div>
       </div>
     </div>
-
-    <button type="button" class="toggle-standalone" role="switch" aria-checked="false" id="${id("compartido")}">
-      <span class="toggle-text">
-        <span class="title">Compartido con Iru</span>
-        <span class="sub">Se registra el 50% del monto</span>
-      </span>
-      <span class="switch" id="${id("switch")}"><span class="knob"></span></span>
-    </button>
   `;
 
   const el = nombre => document.getElementById(id(nombre));
@@ -85,6 +77,9 @@ function crearFormulario(contenedor, prefijo) {
   let medio = "Crédito";
   let cuotas = 1;
   let minCuotas = 1;
+  // El switch "Compartido con Iru" ya no está en pantalla: lo compartido se carga
+  // en la planilla de compartidos. Se conserva el dato para que editar un gasto
+  // viejo marcado como compartido no le quite la división por dos.
   let compartido = false;
   let cuotasBloqueadas = false;
 
@@ -102,15 +97,12 @@ function crearFormulario(contenedor, prefijo) {
     el("chipContado").disabled = cuotasBloqueadas;
   }
 
-  function pintarCompartido() {
-    el("switch").classList.toggle("on", compartido);
-    el("compartido").setAttribute("aria-checked", String(compartido));
-  }
-
   function pintarCategoria() {
     const cat = el("categoria");
     cat.classList.toggle("unset", cat.value === "");
     el("fieldTipoInversion").classList.toggle("hidden", cat.value !== "Inversiones");
+    // En las inversiones el nombre es el tipo (o el detalle): no hace falta descripción
+    el("descripcion").classList.toggle("hidden", cat.value === "Inversiones");
     const tipo = el("tipoInversion");
     tipo.classList.toggle("unset", tipo.value === "");
     el("fieldInvOtros").classList.toggle("hidden", cat.value !== "Inversiones" || tipo.value !== "Otros");
@@ -135,7 +127,6 @@ function crearFormulario(contenedor, prefijo) {
   });
   el("cuotasMinus").addEventListener("click", () => { cuotas = Math.max(minCuotas, cuotas - 1); pintarCuotas(); });
   el("cuotasPlus").addEventListener("click", () => { cuotas = Math.min(48, cuotas + 1); pintarCuotas(); });
-  el("compartido").addEventListener("click", () => { compartido = !compartido; pintarCompartido(); });
 
   function tipoInversionElegido() {
     if (el("categoria").value !== "Inversiones") return null;
@@ -146,8 +137,10 @@ function crearFormulario(contenedor, prefijo) {
   const api = {
     // Datos tal como los espera el script
     getDatos() {
+      const tipo = tipoInversionElegido();
       return {
-        descripcion: el("descripcion").value.trim(),
+        // El script pide descripción: en las inversiones va el tipo o el detalle
+        descripcion: tipo !== null ? tipo : el("descripcion").value.trim(),
         montoTotal: parseInt(el("monto").value.replace(/\./g, "")) || 0,
         categoria: el("categoria").value,
         medioPago: medio,
@@ -155,15 +148,16 @@ function crearFormulario(contenedor, prefijo) {
         mesResumen: parseInt(el("mes").value),
         anioResumen: parseInt(el("anio").value),
         cuotas: medio === "Crédito" ? cuotas : 1,
-        tipoInversion: tipoInversionElegido()
+        tipoInversion: tipo
       };
     },
 
     // Devuelve el mensaje de error, o null si está todo bien
     validar() {
       const d = api.getDatos();
-      if (!d.descripcion) return "⚠️ Completá la descripción";
       if (!d.categoria) return "⚠️ Seleccioná una categoría";
+      if (d.categoria === "Inversiones" && !el("tipoInversion").value) return "⚠️ Seleccioná el tipo de inversión";
+      if (!d.descripcion) return "⚠️ Completá la descripción";
       if (!d.montoTotal || d.montoTotal <= 0) return "⚠️ Ingresá un monto válido";
       return null;
     },
@@ -193,7 +187,7 @@ function crearFormulario(contenedor, prefijo) {
         el("anio").value = d.anioResumen;
       }
 
-      pintarCategoria(); pintarMedio(); pintarCuotas(); pintarCompartido();
+      pintarCategoria(); pintarMedio(); pintarCuotas();
     },
 
     // Limpia lo que se carga en cada gasto. Medio, mes y año quedan como estaban.
@@ -205,7 +199,7 @@ function crearFormulario(contenedor, prefijo) {
       el("invOtros").value = "";
       cuotas = Math.max(1, minCuotas);
       compartido = false;
-      pintarCategoria(); pintarCuotas(); pintarCompartido();
+      pintarCategoria(); pintarCuotas();
     },
 
     // Para editar "solo esta cuota": no se puede cambiar el medio ni las cuotas
@@ -223,7 +217,7 @@ function crearFormulario(contenedor, prefijo) {
 
   el("mes").value = hoy.getMonth();
   el("anio").value = hoy.getFullYear();
-  pintarMedio(); pintarCuotas(); pintarCompartido();
+  pintarMedio(); pintarCuotas();
 
   return api;
 }
